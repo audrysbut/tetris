@@ -1,0 +1,20 @@
+{
+  "name": "@workspace/web",
+  "version": "0.1.0",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
+  "imports": {
+    "react": "npm:react@^18.3.1",
+    "react-dom": "npm:react-dom@^18.3.1",
+    "react-dom/client": "npm:react-dom@^18.3.1/client",
+    "react/jsx-runtime": "npm:react@^18.3.1/jsx-runtime",
+    "vite": "npm:vite@^6.0.3",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.3.4"
+  },
+  "tasks": {
+    "dev": "deno run -A npm:vite",
+    "build": "deno run -A npm:vite build"
+  }
+}

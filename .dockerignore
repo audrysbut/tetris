@@ -1,0 +1,10 @@
+.git
+.gitignore
+README.md
+**/node_modules
+**/.env*
+apps/web/dist
+**/*.log
+.cursor
+*.md
+deno.lock
