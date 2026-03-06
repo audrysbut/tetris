@@ -3,9 +3,25 @@ import { useKeyboard } from "../game/useKeyboard";
 import { BoardCanvas } from "./BoardCanvas";
 import { HUD, NextPiece } from "./HUD";
 import type { KeyAction } from "../game/useKeyboard";
+import { useState, useEffect } from "react";
 
 export function SinglePlayerGame() {
-  const { state, isPaused, setPaused, dispatch, reset } = useSinglePlayer();
+  const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer();
+  const [dropProgress, setDropProgress] = useState(0);
+
+  // requestAnimationFrame: compute drop progress for smooth falling
+  useEffect(() => {
+    if (state.gameOver || isPaused || !state.currentPiece) return;
+    let rafId: number;
+    const tick = () => {
+      const elapsed = Date.now() - lastTickAt;
+      const progress = Math.min(elapsed / dropIntervalMs, 0.9999);
+      setDropProgress(progress);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [state.gameOver, isPaused, state.currentPiece, lastTickAt, dropIntervalMs]);
 
   useKeyboard(
     (action: KeyAction) => {
@@ -34,7 +50,7 @@ export function SinglePlayerGame() {
             gameOver={state.gameOver}
             isPaused={isPaused}
           />
-          <BoardCanvas state={state} />
+          <BoardCanvas state={state} dropProgress={dropProgress} />
           <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
             <button type="button" onClick={reset}>
               {state.gameOver ? "Play again" : "Restart"}

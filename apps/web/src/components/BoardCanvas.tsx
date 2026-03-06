@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 import type { GameState } from "@shared/mod";
 
-const CELL_SIZE = 24;
+const CELL_SIZE = 32;
 const BORDER = 1;
 
 const COLORS: string[] = [
@@ -21,6 +21,8 @@ interface BoardCanvasProps {
   width?: number;
   height?: number;
   cellSize?: number;
+  /** 0–1 fraction of current drop interval elapsed (single-player smooth fall). */
+  dropProgress?: number;
 }
 
 export function BoardCanvas({
@@ -28,6 +30,7 @@ export function BoardCanvas({
   width = BOARD_WIDTH,
   height = BOARD_HEIGHT,
   cellSize = CELL_SIZE,
+  dropProgress,
 }: BoardCanvasProps) {
   const canvasW = width * cellSize;
   const canvasH = height * cellSize;
@@ -74,10 +77,11 @@ export function BoardCanvas({
         ctx.restore();
       }
     }
-    // Current piece
+    // Current piece (optionally interpolated Y for smooth fall)
     if (currentPiece) {
       const shape = getShape(currentPiece.type, currentPiece.rotation);
       const color = COLORS[currentPiece.type + 1];
+      const effectiveY = currentPiece.position.y + (dropProgress ?? 0);
       ctx.fillStyle = color;
       for (let row = 0; row < shape.length; row++) {
         for (let col = 0; col < shape[row].length; col++) {
@@ -85,7 +89,7 @@ export function BoardCanvas({
             const x =
               (currentPiece.position.x + col) * cellSize + BORDER;
             const y =
-              (currentPiece.position.y + row) * cellSize + BORDER;
+              (effectiveY + row) * cellSize + BORDER;
             const size = cellSize - BORDER * 2;
             ctx.fillRect(x, y, size, size);
           }
@@ -106,7 +110,7 @@ export function BoardCanvas({
     const ctx = el.getContext("2d");
     if (!ctx) return;
     draw(ctx);
-  }, [state]);
+  }, [state, dropProgress]);
 
   return (
     <canvas
