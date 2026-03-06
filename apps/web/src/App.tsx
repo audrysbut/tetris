@@ -1,9 +1,63 @@
+import { useState } from "react";
+import { Home } from "./components/Home";
+import { SinglePlayerGame } from "./components/SinglePlayerGame";
+import { Lobby } from "./components/Lobby";
+import { MultiplayerGame } from "./components/MultiplayerGame";
+import type { JoinMatchResult } from "./api/match";
+
+type Screen = "home" | "single" | "lobby" | "multiplayer";
+
 function App() {
+  const [screen, setScreen] = useState<Screen>("home");
+  const [joinResult, setJoinResult] = useState<JoinMatchResult | null>(null);
+
+  if (screen === "single") {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setScreen("home")}
+          style={{ position: "absolute", top: 16, left: 16 }}
+        >
+          ← Back
+        </button>
+        <SinglePlayerGame />
+      </>
+    );
+  }
+
+  if (screen === "multiplayer" && joinResult) {
+    return (
+      <MultiplayerGame
+        joinResult={joinResult}
+        onBack={() => { setScreen("home"); setJoinResult(null); }}
+      />
+    );
+  }
+
+  if (screen === "lobby") {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setScreen("home")}
+          style={{ position: "absolute", top: 16, left: 16 }}
+        >
+          ← Back
+        </button>
+        <Lobby
+          onBack={() => setScreen("home")}
+          onJoinGame={(result) => { setJoinResult(result); setScreen("multiplayer"); }}
+        />
+      </>
+    );
+  }
+
   return (
-    <main>
-      <h1>Vite + React</h1>
-      <p>Edit <code>src/App.tsx</code> and save to test HMR.</p>
-    </main>
+    <Home
+      onSinglePlayer={() => setScreen("single")}
+      onMultiplayer={() => setScreen("lobby")}
+    />
   );
 }
 

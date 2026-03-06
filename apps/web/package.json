@@ -1,0 +1,8 @@
+{
+  "name": "@workspace/web",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@stomp/stompjs": "^7.0.0"
+  }
+}

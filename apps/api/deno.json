@@ -11,7 +11,9 @@
     "@nestjs/common": "npm:@nestjs/common@^10.4.15",
     "@nestjs/platform-express": "npm:@nestjs/platform-express@^10.4.15",
     "reflect-metadata": "npm:reflect-metadata@^0.2.2",
-    "express": "npm:express@^4.21.0"
+    "express": "npm:express@^4.21.0",
+    "amqplib": "npm:amqplib@^0.10.4",
+    "shared": "../../packages/shared/mod.ts"
   },
   "tasks": {
     "dev": "deno run --watch -A main.ts",
