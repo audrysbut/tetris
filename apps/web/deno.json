@@ -15,7 +15,7 @@
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.3.4"
   },
   "tasks": {
-    "dev": "deno run -A npm:vite",
-    "build": "deno run -A npm:vite build"
+    "dev": "node ./node_modules/vite/bin/vite.js",
+    "build": "node ./node_modules/vite/bin/vite.js build"
   }
 }

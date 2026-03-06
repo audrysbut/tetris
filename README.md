@@ -8,7 +8,7 @@
 ### Single player only
 
 ```bash
-deno task dev:web
+deno task web:dev
 ```
 
 Open http://localhost:4200 → Single player.

@@ -13,7 +13,7 @@ const KEY_MAP: Record<string, KeyAction> = {
   ArrowRight: "right",
   ArrowUp: "rotate",
   ArrowDown: "softDrop",
-  " ": "hardDrop",
+  Space: "hardDrop",
   KeyP: "pause",
 };
 
