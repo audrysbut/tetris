@@ -81,7 +81,11 @@ export function BoardCanvas({
     if (currentPiece) {
       const shape = getShape(currentPiece.type, currentPiece.rotation);
       const color = COLORS[currentPiece.type + 1];
-      const effectiveY = currentPiece.position.y + (dropProgress ?? 0);
+      const ghost = ghostPosition(board, currentPiece);
+      // At landing position: don't add progress so we never draw one row below
+      const progress =
+        currentPiece.position.y === ghost.position.y ? 0 : (dropProgress ?? 0);
+      const effectiveY = currentPiece.position.y + progress;
       ctx.fillStyle = color;
       for (let row = 0; row < shape.length; row++) {
         for (let col = 0; col < shape[row].length; col++) {
