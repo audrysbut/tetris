@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { getShape, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
+import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 import type { GameState } from "@shared/mod";
 
 const CELL_SIZE = 24;
@@ -46,6 +46,31 @@ export function BoardCanvas({
         const size = cellSize - BORDER * 2;
         ctx.fillStyle = COLORS[value] ?? "#333";
         ctx.fillRect(x, y, size, size);
+      }
+    }
+    // Ghost piece (landing indicator): draw only when different from current position
+    if (currentPiece) {
+      const ghost = ghostPosition(board, currentPiece);
+      if (
+        ghost.position.x !== currentPiece.position.x ||
+        ghost.position.y !== currentPiece.position.y
+      ) {
+        const shape = getShape(ghost.type, ghost.rotation);
+        const color = COLORS[ghost.type + 1];
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = color;
+        for (let row = 0; row < shape.length; row++) {
+          for (let col = 0; col < shape[row].length; col++) {
+            if (shape[row][col]) {
+              const x = (ghost.position.x + col) * cellSize + BORDER;
+              const y = (ghost.position.y + row) * cellSize + BORDER;
+              const size = cellSize - BORDER * 2;
+              ctx.fillRect(x, y, size, size);
+            }
+          }
+        }
+        ctx.restore();
       }
     }
     // Current piece

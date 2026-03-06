@@ -44,6 +44,21 @@ export function collides(
   return false;
 }
 
+/** Return the piece at its landing position (lowest Y where it can sit without colliding). Used for ghost/indicator. */
+export function ghostPosition(board: Board, piece: CurrentPiece): CurrentPiece {
+  let ghost: CurrentPiece = {
+    ...piece,
+    position: { ...piece.position },
+  };
+  while (!collides(board, ghost, { x: 0, y: 1 })) {
+    ghost = {
+      ...ghost,
+      position: { ...ghost.position, y: ghost.position.y + 1 },
+    };
+  }
+  return ghost;
+}
+
 /** Merge current piece into board and return new board (does not mutate) */
 export function mergePiece(board: Board, piece: CurrentPiece): Board {
   const next = cloneBoard(board);
