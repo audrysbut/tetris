@@ -26,6 +26,7 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
   const { matchId, playerId, actionsDestination, updatesDestination, gameStarted } = joinResult;
   const [room, setRoom] = useState<ReturnType<typeof parseRoomUpdate>>(null);
   const [connected, setConnected] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { connect, disconnect, subscribe, send } = useWebStomp();
   const unsubRef = useRef<(() => void) | null>(null);
 
@@ -79,7 +80,43 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
       </button>
       {!connected && <p>Connecting to game… (reconnecting if connection was lost)</p>}
       {connected && !gameStarted && !room?.event && (
-        <p>Waiting for opponent to join…</p>
+        <>
+          <div style={{ marginTop: 16, padding: 16, background: "#f0f4f8", borderRadius: 8, maxWidth: 400 }}>
+            <p style={{ margin: "0 0 8px", fontWeight: "bold" }}>Share this match ID with your opponent:</p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 24,
+                fontFamily: "monospace",
+                letterSpacing: 2,
+                userSelect: "all",
+                padding: "12px 16px",
+                background: "#fff",
+                borderRadius: 4,
+                border: "1px solid #ccc",
+              }}
+              title="Click to select, then copy"
+            >
+              {matchId}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(matchId).then(() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                });
+              }}
+              style={{ marginTop: 8, padding: "6px 12px" }}
+            >
+              {copied ? "Copied!" : "Copy match ID"}
+            </button>
+            <p style={{ margin: "8px 0 0", fontSize: 13, color: "#555" }}>
+              They can enter this in the lobby under “Join match”.
+            </p>
+          </div>
+          <p style={{ marginTop: 12 }}>Waiting for opponent to join…</p>
+        </>
       )}
       {connected && (gameStarted || room?.event === "gameStart") && (
         <>
