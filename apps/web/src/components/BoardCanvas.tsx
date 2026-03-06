@@ -56,10 +56,10 @@ export function BoardCanvas({
         ghost.position.y !== currentPiece.position.y
       ) {
         const shape = getShape(ghost.type, ghost.rotation);
-        const color = COLORS[ghost.type + 1];
         ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.fillStyle = color;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
         for (let row = 0; row < shape.length; row++) {
           for (let col = 0; col < shape[row].length; col++) {
             if (shape[row][col]) {
@@ -67,6 +67,7 @@ export function BoardCanvas({
               const y = (ghost.position.y + row) * cellSize + BORDER;
               const size = cellSize - BORDER * 2;
               ctx.fillRect(x, y, size, size);
+              ctx.strokeRect(x, y, size, size);
             }
           }
         }
