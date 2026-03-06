@@ -1,16 +1,16 @@
-# Build stage
-FROM denoland/deno:latest AS builder
+# Build stage: Node for Vite/React (shared package lives at ../../packages from apps/web)
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY deno.json .
-COPY apps/api/ ./apps/api/
-COPY apps/web/ ./apps/web/
+# Copy shared package and web app so path alias ../../packages/shared resolves
+COPY packages/ packages/
+COPY apps/web/ apps/web/
 
 WORKDIR /app/apps/web
 
-RUN deno install
-RUN deno task build
+RUN npm ci
+RUN npx vite build
 
 # Serve stage
 FROM nginx:alpine

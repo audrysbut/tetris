@@ -13,13 +13,15 @@ deno task dev:web
 
 Open http://localhost:4200 → Single player.
 
-### With multiplayer (API + RabbitMQ)
+### With multiplayer (API + RabbitMQ + UI)
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
-- Web: http://localhost:8080
+Or with a rebuild: `docker compose up -d --build`
+
+- **UI:** http://localhost:8080 (single-player and multiplayer)
 - API: http://localhost:3000
 - RabbitMQ Management: http://localhost:15672 (guest/guest)
 - **Web STOMP (browsers):** `ws://localhost:15674/ws` — use this URL in the frontend for STOMP over WebSocket.

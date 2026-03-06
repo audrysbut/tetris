@@ -3,6 +3,7 @@ FROM denoland/deno:latest
 WORKDIR /app
 
 COPY deno.json .
+COPY packages/ ./packages/
 COPY apps/api/ ./apps/api/
 COPY apps/web/ ./apps/web/
 
