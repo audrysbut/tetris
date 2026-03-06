@@ -86,6 +86,8 @@ export function BoardCanvas({
       for (let row = 0; row < shape.length; row++) {
         for (let col = 0; col < shape[row].length; col++) {
           if (shape[row][col]) {
+            const cellY = effectiveY + row;
+            if (cellY >= height) continue; // don't draw below board
             const x =
               (currentPiece.position.x + col) * cellSize + BORDER;
             const y =

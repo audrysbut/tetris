@@ -12,6 +12,7 @@ export function SinglePlayerGame() {
   // requestAnimationFrame: compute drop progress for smooth falling
   useEffect(() => {
     if (state.gameOver || isPaused || !state.currentPiece) return;
+    setDropProgress(0); // reset so we never draw at new position.y + stale progress
     let rafId: number;
     const tick = () => {
       const elapsed = Date.now() - lastTickAt;
