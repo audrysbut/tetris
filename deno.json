@@ -2,8 +2,8 @@
   "workspace": ["./apps/api", "./apps/web", "./packages/shared"],
   "nodeModulesDir": "auto",
   "tasks": {
-    "dev": "deno task dev:api & deno task web:dev",
-    "dev:api": "deno task --cwd apps/api dev",
+    "dev": "deno task api:dev & deno task web:dev",
+    "api:dev": "deno task --cwd apps/api dev",
     "web:dev": "deno task --cwd apps/web dev"
   }
 }
