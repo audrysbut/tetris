@@ -33,7 +33,6 @@ export function useSinglePlayer(constantSpeed = false) {
     const ms = constantSpeed
       ? DEFAULT_DROP_MS
       : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
-    setLastTickAt(Date.now());
     intervalRef.current = window.setInterval(() => {
       setLastTickAt(Date.now());
       setState((s) => {

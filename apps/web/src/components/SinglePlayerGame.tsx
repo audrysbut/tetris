@@ -4,27 +4,31 @@ import { useGamepad } from "../game/useGamepad.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export function SinglePlayerGame() {
   const [constantSpeed, setConstantSpeed] = useState(false);
   const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer(constantSpeed);
   const [dropProgress, setDropProgress] = useState(0);
+  const dropIntervalMsRef = useRef(dropIntervalMs);
+  dropIntervalMsRef.current = dropIntervalMs;
 
   // requestAnimationFrame: compute drop progress for smooth falling
+  // Only re-run when lastTickAt changes (real tick), not when dropIntervalMs changes (level up),
+  // to avoid jitter from resetting progress without the piece moving.
   useEffect(() => {
     if (state.gameOver || isPaused || !state.currentPiece) return;
-    setDropProgress(0); // reset so we never draw at new position.y + stale progress
+    setDropProgress(0);
     let rafId: number;
     const tick = () => {
       const elapsed = Date.now() - lastTickAt;
-      const progress = Math.min(elapsed / dropIntervalMs, 0.9999);
+      const progress = Math.min(elapsed / dropIntervalMsRef.current, 0.9999);
       setDropProgress(progress);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [state.gameOver, isPaused, lastTickAt, dropIntervalMs]);
+  }, [state.gameOver, isPaused, lastTickAt]);
 
   const handleAction = useCallback(
     (action: KeyAction) => {
