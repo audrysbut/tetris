@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useWebStomp } from "../game/useWebStomp";
-import { useKeyboard } from "../game/useKeyboard";
-import { BoardCanvas } from "./BoardCanvas";
-import { HUD } from "./HUD";
-import { parseRoomUpdate, toGameState } from "../api/types";
-import type { JoinMatchResult } from "../api/match";
+import { useWebStomp } from "../game/useWebStomp.ts";
+import { useKeyboard } from "../game/useKeyboard.ts";
+import { BoardCanvas } from "./BoardCanvas.tsx";
+import { HUD } from "./HUD.tsx";
+import { parseRoomUpdate, toGameState } from "../api/types.ts";
+import type { JoinMatchResult } from "../api/match.ts";
 import type { GameState } from "@shared/mod";
 
 interface MultiplayerGameProps {

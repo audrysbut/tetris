@@ -1,5 +1,5 @@
 import { getShape } from "@shared/mod";
-import { BoardCanvas } from "./BoardCanvas";
+import { BoardCanvas } from "./BoardCanvas.tsx";
 import type { GameState } from "@shared/mod";
 
 interface HUDProps {

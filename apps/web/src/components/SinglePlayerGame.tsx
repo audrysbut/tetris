@@ -1,8 +1,8 @@
-import { useSinglePlayer } from "../game/useSinglePlayer";
-import { useKeyboard } from "../game/useKeyboard";
-import { BoardCanvas } from "./BoardCanvas";
-import { HUD, NextPiece } from "./HUD";
-import type { KeyAction } from "../game/useKeyboard";
+import { useSinglePlayer } from "../game/useSinglePlayer.ts";
+import { useKeyboard } from "../game/useKeyboard.ts";
+import { BoardCanvas } from "./BoardCanvas.tsx";
+import { HUD, NextPiece } from "./HUD.tsx";
+import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect } from "react";
 
 export function SinglePlayerGame() {

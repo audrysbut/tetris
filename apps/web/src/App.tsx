@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Home } from "./components/Home";
-import { SinglePlayerGame } from "./components/SinglePlayerGame";
-import { Lobby } from "./components/Lobby";
-import { MultiplayerGame } from "./components/MultiplayerGame";
-import type { JoinMatchResult } from "./api/match";
+import { Home } from "./components/Home.tsx";
+import { SinglePlayerGame } from "./components/SinglePlayerGame.tsx";
+import { Lobby } from "./components/Lobby.tsx";
+import { MultiplayerGame } from "./components/MultiplayerGame.tsx";
+import type { JoinMatchResult } from "./api/match.ts";
 
 type Screen = "home" | "single" | "lobby" | "multiplayer";
 

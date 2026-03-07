@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { createMatch, joinMatch } from "../api/match";
-import type { CreateMatchResult, JoinMatchResult } from "../api/match";
+import { createMatch, joinMatch } from "../api/match.ts";
+import type { CreateMatchResult, JoinMatchResult } from "../api/match.ts";
 
 interface LobbyProps {
   onBack: () => void;
