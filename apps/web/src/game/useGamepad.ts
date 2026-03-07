@@ -3,6 +3,8 @@ import type { KeyAction } from "./useKeyboard.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
 const AXIS_THRESHOLD = 0.5;
+const REPEAT_MS = 90;
+const SOFT_DROP_REPEAT_MS = 90;
 
 function getFirstGamepad(): Gamepad | null {
   const list = navigator.getGamepads?.();
@@ -26,6 +28,11 @@ export function useGamepad(
     axisLeftRight: 0,
     axisDown: 0,
     axisUp: 0,
+  });
+  const repeatRef = useRef({
+    lastLeft: 0,
+    lastRight: 0,
+    lastDown: 0,
   });
 
   const poll = useCallback(() => {
@@ -63,12 +70,36 @@ export function useGamepad(
 
     const fire = (action: KeyAction) => onActionRef.current(action);
 
-    if (left && !prev.buttons[14] && !(prev.axisLeftRight < -AXIS_THRESHOLD))
-      fire("left");
-    if (right && !prev.buttons[15] && !(prev.axisLeftRight > AXIS_THRESHOLD))
-      fire("right");
-    if (down && !prev.buttons[13] && !prev.buttons[1] && !(prev.axisDown >= AXIS_THRESHOLD))
-      fire("softDrop");
+    const wasLeft = !!prev.buttons[14] || prev.axisLeftRight < -AXIS_THRESHOLD;
+    const wasRight = !!prev.buttons[15] || prev.axisLeftRight > AXIS_THRESHOLD;
+    const wasDown = !!prev.buttons[13] || !!prev.buttons[1] || prev.axisDown >= AXIS_THRESHOLD;
+    const now = Date.now();
+
+    if (left) {
+      if (!wasLeft || now - repeatRef.current.lastLeft >= REPEAT_MS) {
+        fire("left");
+        repeatRef.current.lastLeft = now;
+      }
+    } else {
+      repeatRef.current.lastLeft = 0;
+    }
+    if (right) {
+      if (!wasRight || now - repeatRef.current.lastRight >= REPEAT_MS) {
+        fire("right");
+        repeatRef.current.lastRight = now;
+      }
+    } else {
+      repeatRef.current.lastRight = 0;
+    }
+    if (down) {
+      if (!wasDown || now - repeatRef.current.lastDown >= SOFT_DROP_REPEAT_MS) {
+        fire("softDrop");
+        repeatRef.current.lastDown = now;
+      }
+    } else {
+      repeatRef.current.lastDown = 0;
+    }
+
     if (rotate && !(prev.buttons[0] || prev.buttons[1] || prev.buttons[2])) fire("rotate");
     if (hardDrop && !(prev.buttons[3] || prev.buttons[5] || prev.buttons[12]) &&
         !(prev.axisUp <= -AXIS_THRESHOLD)) fire("hardDrop");
