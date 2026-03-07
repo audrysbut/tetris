@@ -5,6 +5,9 @@ import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
+
+const MAX_CELL_SIZE = 44;
 
 export function SinglePlayerGame() {
   const [constantSpeed, setConstantSpeed] = useState(true);
@@ -12,6 +15,27 @@ export function SinglePlayerGame() {
   const [dropProgress, setDropProgress] = useState(0);
   const dropIntervalMsRef = useRef(dropIntervalMs);
   dropIntervalMsRef.current = dropIntervalMs;
+  const boardContainerRef = useRef<HTMLDivElement>(null);
+  const [cellSize, setCellSize] = useState(MAX_CELL_SIZE);
+
+  // Fit board in viewport: measure container and cap cell size so board doesn't overflow
+  useEffect(() => {
+    const el = boardContainerRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      if (w <= 0 || h <= 0) return;
+      const sizeByW = w / BOARD_WIDTH;
+      const sizeByH = h / BOARD_HEIGHT;
+      const next = Math.min(sizeByW, sizeByH, MAX_CELL_SIZE);
+      setCellSize(Math.max(8, Math.floor(next)));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // requestAnimationFrame: compute drop progress for smooth falling
   // Only re-run when lastTickAt changes (real tick), not when dropIntervalMs changes (level up),
@@ -49,10 +73,27 @@ export function SinglePlayerGame() {
   useGamepad(handleAction, !state.gameOver, { onHome: reset });
 
   return (
-    <div style={{ padding: 8, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-      <h2 style={{ marginTop: 0, marginBottom: 4, fontSize: 18 }}>Single Player</h2>
-      <div style={{ display: "flex", alignItems: "flex-start" }}>
-        <div>
+    <div
+      style={{
+        flex: 1,
+        minHeight: 0,
+        padding: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+      }}
+    >
+      <h2 style={{ marginTop: 0, marginBottom: 4, fontSize: 18, flexShrink: 0 }}>Single Player</h2>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0, flex: 1, minHeight: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            minWidth: 140,
+            flexShrink: 0,
+          }}
+        >
           <HUD
             score={state.score}
             lines={state.lines}
@@ -60,16 +101,18 @@ export function SinglePlayerGame() {
             gameOver={state.gameOver}
             isPaused={isPaused}
           />
-          <BoardCanvas state={state} dropProgress={dropProgress} />
-          <div style={{ marginTop: 4, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <button type="button" onClick={reset}>
-              {state.gameOver ? "Play again" : "Restart"}
-            </button>
-            {!state.gameOver && (
-              <button type="button" onClick={() => setPaused((p) => !p)}>
-                {isPaused ? "Resume" : "Pause"}
+          <NextPiece nextPieceType={state.nextPieceType} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <button type="button" onClick={reset}>
+                {state.gameOver ? "Play again" : "Restart"}
               </button>
-            )}
+              {!state.gameOver && (
+                <button type="button" onClick={() => setPaused((p) => !p)}>
+                  {isPaused ? "Resume" : "Pause"}
+                </button>
+              )}
+            </div>
             <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
               <input
                 type="checkbox"
@@ -80,11 +123,10 @@ export function SinglePlayerGame() {
             </label>
           </div>
         </div>
-        <NextPiece nextPieceType={state.nextPieceType} />
+        <div ref={boardContainerRef} style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", alignItems: "flex-start", justifyContent: "flex-start" }}>
+          <BoardCanvas state={state} dropProgress={dropProgress} cellSize={cellSize} />
+        </div>
       </div>
-      <p style={{ fontSize: 11, color: "#666", marginTop: 6 }}>
-        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause. Gamepad: D-pad or left stick to move, D-pad up hard drop, A rotate, B soft drop, Y hard drop, Start pause, Home new game. (If gamepad does nothing, click the game area then press any gamepad button.)
-      </p>
     </div>
   );
 }

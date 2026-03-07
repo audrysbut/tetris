@@ -14,10 +14,20 @@ function App() {
 
   if (screen === "single") {
     return (
-      <>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          background: "#1a1a1a",
+          color: "#eee",
+        }}
+      >
         <BackButton onClick={() => setScreen("home")} />
         <SinglePlayerGame />
-      </>
+      </div>
     );
   }
 

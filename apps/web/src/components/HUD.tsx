@@ -34,7 +34,7 @@ export function NextPiece({ nextPieceType }: NextPieceProps) {
   const cols = shape[0].length;
   const color = CELL_COLORS[nextPieceType + 1];
   return (
-    <div style={{ marginLeft: 12 }}>
+    <div style={{ marginTop: 8 }}>
       <div style={{ fontSize: 11, marginBottom: 2 }}>Next</div>
       <div
         style={{
