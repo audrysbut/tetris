@@ -1,9 +1,10 @@
 import { useSinglePlayer } from "../game/useSinglePlayer.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
+import { useGamepad } from "../game/useGamepad.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export function SinglePlayerGame() {
   const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer();
@@ -24,7 +25,7 @@ export function SinglePlayerGame() {
     return () => cancelAnimationFrame(rafId);
   }, [state.gameOver, isPaused, state.currentPiece, lastTickAt, dropIntervalMs]);
 
-  useKeyboard(
+  const handleAction = useCallback(
     (action: KeyAction) => {
       if (action === "pause") {
         setPaused((p) => !p);
@@ -36,8 +37,11 @@ export function SinglePlayerGame() {
       else if (action === "softDrop") dispatch({ type: "move", dir: "down" });
       else if (action === "hardDrop") dispatch({ type: "hardDrop" });
     },
-    !state.gameOver
+    [dispatch, setPaused]
   );
+
+  useKeyboard(handleAction, !state.gameOver);
+  useGamepad(handleAction, !state.gameOver);
 
   return (
     <div style={{ padding: 8, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -66,7 +70,7 @@ export function SinglePlayerGame() {
         <NextPiece nextPieceType={state.nextPieceType} />
       </div>
       <p style={{ fontSize: 11, color: "#666", marginTop: 6 }}>
-        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause
+        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause. Gamepad: D-pad or left stick to move, A rotate, B soft drop, Y hard drop, Start pause. (If gamepad does nothing, click the game area then press any gamepad button.)
       </p>
     </div>
   );

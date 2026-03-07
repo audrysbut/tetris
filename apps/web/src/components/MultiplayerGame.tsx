@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useWebStomp } from "../game/useWebStomp.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
+import { useGamepad } from "../game/useGamepad.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD } from "./HUD.tsx";
 import { parseRoomUpdate, toGameState } from "../api/types.ts";
 import type { JoinMatchResult } from "../api/match.ts";
+import type { KeyAction } from "../game/useKeyboard.ts";
 import type { GameState } from "@shared/mod";
 
 interface MultiplayerGameProps {
@@ -54,8 +56,8 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
     [actionsDestination, matchId, playerId, send]
   );
 
-  useKeyboard(
-    (action) => {
+  const handleAction = useCallback(
+    (action: KeyAction) => {
       if (room?.status === "finished" || !room) return;
       if (action === "left") sendAction("move", "left");
       else if (action === "right") sendAction("move", "right");
@@ -63,8 +65,11 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
       else if (action === "softDrop") sendAction("move", "down");
       else if (action === "hardDrop") sendAction("hardDrop");
     },
-    connected && room?.status === "playing"
+    [room, sendAction]
   );
+
+  useKeyboard(handleAction, connected && room?.status === "playing");
+  useGamepad(handleAction, connected && room?.status === "playing");
 
   const myState: GameState = room
     ? toGameState(playerId === 1 ? room.player1 : room.player2)
