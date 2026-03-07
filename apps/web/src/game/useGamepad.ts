@@ -22,10 +22,13 @@ function getFirstGamepad(): Gamepad | null {
 
 export function useGamepad(
   onAction: (action: KeyAction) => void,
-  enabled: boolean
+  enabled: boolean,
+  options?: { onHome?: () => void }
 ) {
   const onActionRef = useRef(onAction);
   onActionRef.current = onAction;
+  const onHomeRef = useRef(options?.onHome);
+  onHomeRef.current = options?.onHome;
 
   const prevRef = useRef({
     buttons: Array(20).fill(false) as boolean[],
@@ -133,6 +136,7 @@ export function useGamepad(
     if (hardDrop && !(prev.buttons[3] || prev.buttons[5] || prev.buttons[12]) &&
         !(prev.axisUp <= -AXIS_THRESHOLD)) fire("hardDrop");
     if (pause && !prev.buttons[9]) fire("pause");
+    if (!!buttons[16] && !prev.buttons[16]) onHomeRef.current?.();
 
     prevRef.current = {
       buttons,

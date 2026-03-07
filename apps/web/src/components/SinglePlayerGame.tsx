@@ -7,7 +7,8 @@ import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect, useCallback } from "react";
 
 export function SinglePlayerGame() {
-  const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer();
+  const [constantSpeed, setConstantSpeed] = useState(false);
+  const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer(constantSpeed);
   const [dropProgress, setDropProgress] = useState(0);
 
   // requestAnimationFrame: compute drop progress for smooth falling
@@ -41,7 +42,7 @@ export function SinglePlayerGame() {
   );
 
   useKeyboard(handleAction, !state.gameOver);
-  useGamepad(handleAction, !state.gameOver);
+  useGamepad(handleAction, !state.gameOver, { onHome: reset });
 
   return (
     <div style={{ padding: 8, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
@@ -51,12 +52,12 @@ export function SinglePlayerGame() {
           <HUD
             score={state.score}
             lines={state.lines}
-            level={state.level}
+            level={constantSpeed ? 1 : state.level}
             gameOver={state.gameOver}
             isPaused={isPaused}
           />
           <BoardCanvas state={state} dropProgress={dropProgress} />
-          <div style={{ marginTop: 4, display: "flex", gap: 8 }}>
+          <div style={{ marginTop: 4, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
             <button type="button" onClick={reset}>
               {state.gameOver ? "Play again" : "Restart"}
             </button>
@@ -65,12 +66,20 @@ export function SinglePlayerGame() {
                 {isPaused ? "Resume" : "Pause"}
               </button>
             )}
+            <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
+              <input
+                type="checkbox"
+                checked={constantSpeed}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConstantSpeed(e.target.checked)}
+              />
+              Constant speed
+            </label>
           </div>
         </div>
         <NextPiece nextPieceType={state.nextPieceType} />
       </div>
       <p style={{ fontSize: 11, color: "#666", marginTop: 6 }}>
-        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause. Gamepad: D-pad or left stick to move, D-pad up hard drop, A rotate, B soft drop, Y hard drop, Start pause. (If gamepad does nothing, click the game area then press any gamepad button.)
+        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause. Gamepad: D-pad or left stick to move, D-pad up hard drop, A rotate, B soft drop, Y hard drop, Start pause, Home new game. (If gamepad does nothing, click the game area then press any gamepad button.)
       </p>
     </div>
   );

@@ -9,7 +9,7 @@ import {
   type GameAction,
 } from "@shared/mod";
 
-export function useSinglePlayer() {
+export function useSinglePlayer(constantSpeed = false) {
   const [state, setState] = useState<GameState>(() => createInitialState());
   const [isPaused, setPaused] = useState(false);
   const [lastTickAt, setLastTickAt] = useState(() => Date.now());
@@ -30,7 +30,9 @@ export function useSinglePlayer() {
       }
       return;
     }
-    const ms = Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
+    const ms = constantSpeed
+      ? DEFAULT_DROP_MS
+      : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
     setLastTickAt(Date.now());
     intervalRef.current = window.setInterval(() => {
       setLastTickAt(Date.now());
@@ -43,7 +45,7 @@ export function useSinglePlayer() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [state.gameOver, state.level, isPaused]);
+  }, [state.gameOver, state.level, isPaused, constantSpeed]);
 
   const dispatch = useCallback((action: GameAction) => {
     setState((s) => {
@@ -59,7 +61,9 @@ export function useSinglePlayer() {
     });
   }, []);
 
-  const dropIntervalMs = Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
+  const dropIntervalMs = constantSpeed
+    ? DEFAULT_DROP_MS
+    : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
 
   return { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs };
 }
