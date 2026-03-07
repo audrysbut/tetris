@@ -5,16 +5,16 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "jsxImportSourceTypes": "npm:@types/react@^18.3",
+    "jsxImportSourceTypes": "npm:@types/react@^19.2",
     "lib": ["dom", "dom.iterable", "esnext"]
   },
   "imports": {
-    "react": "npm:react@^18.3.1",
-    "react-dom": "npm:react-dom@^18.3.1",
-    "react-dom/client": "npm:react-dom@^18.3.1/client",
-    "react/jsx-runtime": "npm:react@^18.3.1/jsx-runtime",
-    "vite": "npm:vite@^6.0.3",
-    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^4.3.4"
+    "react": "npm:react@^19.2.4",
+    "react-dom": "npm:react-dom@^19.2.4",
+    "react-dom/client": "npm:react-dom@^19.2.4/client",
+    "react/jsx-runtime": "npm:react@^19.2.4/jsx-runtime",
+    "vite": "npm:vite@^7.3.1",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^5.1.4"
   },
   "tasks": {
     "dev": "node ./node_modules/vite/bin/vite.js",
