@@ -1,4 +1,3 @@
-import { useRef, useEffect } from "react";
 import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 import type { GameState } from "@shared/mod";
 
@@ -32,99 +31,106 @@ export function BoardCanvas({
   cellSize = CELL_SIZE,
   dropProgress,
 }: BoardCanvasProps) {
-  const canvasW = width * cellSize;
-  const canvasH = height * cellSize;
+  const svgW = width * cellSize;
+  const svgH = height * cellSize;
+  const size = cellSize - BORDER * 2;
 
-  const draw = (ctx: CanvasRenderingContext2D) => {
-    const { board, currentPiece } = state;
-    // Board background
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, canvasW, canvasH);
-    // Grid cells
-    for (let row = 0; row < board.length; row++) {
-      for (let col = 0; col < board[row].length; col++) {
-        const value = board[row][col];
-        const x = col * cellSize + BORDER;
-        const y = row * cellSize + BORDER;
-        const size = cellSize - BORDER * 2;
-        ctx.fillStyle = COLORS[value] ?? "#333";
-        ctx.fillRect(x, y, size, size);
-      }
-    }
-    // Ghost piece (landing indicator): draw only when different from current position
-    if (currentPiece) {
-      const ghost = ghostPosition(board, currentPiece);
-      if (
-        ghost.position.x !== currentPiece.position.x ||
-        ghost.position.y !== currentPiece.position.y
-      ) {
-        const shape = getShape(ghost.type, ghost.rotation);
-        ctx.save();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
-        ctx.lineWidth = 2;
-        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-        for (let row = 0; row < shape.length; row++) {
-          for (let col = 0; col < shape[row].length; col++) {
-            if (shape[row][col]) {
-              const x = (ghost.position.x + col) * cellSize + BORDER;
-              const y = (ghost.position.y + row) * cellSize + BORDER;
-              const size = cellSize - BORDER * 2;
-              ctx.fillRect(x, y, size, size);
-              ctx.strokeRect(x, y, size, size);
-            }
-          }
-        }
-        ctx.restore();
-      }
-    }
-    // Current piece (optionally interpolated Y for smooth fall)
-    if (currentPiece) {
-      const shape = getShape(currentPiece.type, currentPiece.rotation);
-      const color = COLORS[currentPiece.type + 1];
-      const ghost = ghostPosition(board, currentPiece);
-      // At landing position: don't add progress so we never draw one row below
-      const progress =
-        currentPiece.position.y === ghost.position.y ? 0 : (dropProgress ?? 0);
-      const effectiveY = currentPiece.position.y + progress;
-      ctx.fillStyle = color;
-      for (let row = 0; row < shape.length; row++) {
-        for (let col = 0; col < shape[row].length; col++) {
-          if (shape[row][col]) {
-            const cellY = effectiveY + row;
-            if (cellY >= height) continue; // don't draw below board
-            const x =
-              (currentPiece.position.x + col) * cellSize + BORDER;
-            const y =
-              (effectiveY + row) * cellSize + BORDER;
-            const size = cellSize - BORDER * 2;
-            ctx.fillRect(x, y, size, size);
-          }
-        }
-      }
-    }
-  };
+  const { board, currentPiece } = state;
 
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  const ref = (el: HTMLCanvasElement | null) => {
-    canvasRef.current = el;
-  };
-
-  useEffect(() => {
-    const el = canvasRef.current;
-    if (!el) return;
-    const ctx = el.getContext("2d");
-    if (!ctx) return;
-    draw(ctx);
-  }, [state, dropProgress]);
+  const ghost = currentPiece ? ghostPosition(board, currentPiece) : null;
+  const ghostDiffers =
+    currentPiece &&
+    ghost &&
+    (ghost.position.x !== currentPiece.position.x ||
+      ghost.position.y !== currentPiece.position.y);
+  const effectiveY =
+    currentPiece && ghost
+      ? currentPiece.position.y +
+        (currentPiece.position.y === ghost.position.y ? 0 : dropProgress ?? 0)
+      : 0;
 
   return (
-    <canvas
-      ref={ref}
-      width={canvasW}
-      height={canvasH}
-      style={{ display: "block", background: "#111" }}
+    <svg
+      width={svgW}
+      height={svgH}
+      viewBox={`0 0 ${svgW} ${svgH}`}
+      style={{ display: "block" }}
       aria-label="Tetris board"
-    />
+    >
+      {/* Background */}
+      <rect width={svgW} height={svgH} fill="#111" />
+      {/* Board cells */}
+      {board.map((row: number[], rowIndex: number) =>
+        row.map((value: number, colIndex: number) => {
+          if (value === 0) return null;
+          const x = colIndex * cellSize + BORDER;
+          const y = rowIndex * cellSize + BORDER;
+          return (
+            <rect
+              key={`board-${rowIndex}-${colIndex}`}
+              x={x}
+              y={y}
+              rx={4}
+              ry={4}
+              width={size}
+              height={size}
+              fill={COLORS[value] ?? "#333"}
+            />
+          );
+        })
+      )}
+      {/* Ghost piece */}
+      {currentPiece && ghostDiffers && ghost && (
+        <g>
+          {getShape(ghost.type, ghost.rotation).map((shapeRow: number[], rowIndex: number) =>
+            shapeRow.map((cell: number, colIndex: number) => {
+              if (!cell) return null;
+              const x = (ghost.position.x + colIndex) * cellSize + BORDER;
+              const y = (ghost.position.y + rowIndex) * cellSize + BORDER;
+              return (
+                <rect
+                  key={`ghost-${rowIndex}-${colIndex}`}
+                  x={x}
+                  y={y}
+                  width={size}
+                  height={size}
+                  rx={4}
+                  ry={4}
+                  fill="rgba(255,255,255,0.12)"
+                  stroke="rgba(255,255,255,0.6)"
+                  strokeWidth={2}
+                />
+              );
+            })
+          )}
+        </g>
+      )}
+      {/* Current piece */}
+      {currentPiece && (
+        <g>
+          {getShape(currentPiece.type, currentPiece.rotation).map(
+            (shapeRow: number[], rowIndex: number) =>
+              shapeRow.map((cell: number, colIndex: number) => {
+                if (!cell) return null;
+                const cellY = effectiveY + rowIndex;
+                if (cellY >= height) return null;
+                const x =
+                  (currentPiece.position.x + colIndex) * cellSize + BORDER;
+                const y = (effectiveY + rowIndex) * cellSize + BORDER;
+                return (
+                  <rect
+                    key={`piece-${rowIndex}-${colIndex}`}
+                    x={x}
+                    y={y}
+                    width={size}
+                    height={size}
+                    fill={COLORS[currentPiece.type + 1]}
+                  />
+                );
+              })
+          )}
+        </g>
+      )}
+    </svg>
   );
 }
