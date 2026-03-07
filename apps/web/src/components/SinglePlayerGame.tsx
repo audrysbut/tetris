@@ -7,7 +7,7 @@ import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 export function SinglePlayerGame() {
-  const [constantSpeed, setConstantSpeed] = useState(false);
+  const [constantSpeed, setConstantSpeed] = useState(true);
   const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer(constantSpeed);
   const [dropProgress, setDropProgress] = useState(0);
   const dropIntervalMsRef = useRef(dropIntervalMs);
