@@ -1,5 +1,6 @@
 import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import amqp from "amqplib";
+import { Buffer } from "node:buffer";
 
 const EXCHANGE_UPDATES = "game.updates";
 
@@ -52,7 +53,7 @@ export class RabbitMQService implements OnModuleDestroy {
     if (!this.channel) throw new Error("RabbitMQ not connected");
     const key = `match.${matchId}.updates`;
     const body = JSON.stringify(payload);
-    this.channel.publish(EXCHANGE_UPDATES, key, new TextEncoder().encode(body));
+    this.channel.publish(EXCHANGE_UPDATES, key, Buffer.from(body, "utf8"));
   }
 
   getActionsQueueName(matchId: string): string {
