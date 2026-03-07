@@ -3,8 +3,8 @@ import type { KeyAction } from "./useKeyboard.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
 const AXIS_THRESHOLD = 0.5;
-const REPEAT_MS = 90;
-const SOFT_DROP_REPEAT_MS = 90;
+const REPEAT_MS = 130;
+const SOFT_DROP_REPEAT_MS = 130;
 
 function getFirstGamepad(): Gamepad | null {
   const list = navigator.getGamepads?.();

@@ -17,7 +17,7 @@ const KEY_MAP: Record<string, KeyAction> = {
   KeyP: "pause",
 };
 
-const KEY_REPEAT_MS = 90;
+const KEY_REPEAT_MS = 130;
 const REPEATABLE: Set<KeyAction> = new Set(["left", "right", "softDrop"]);
 
 export function useKeyboard(
