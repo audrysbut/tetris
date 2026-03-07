@@ -2,7 +2,7 @@
   "workspace": ["./apps/api", "./apps/web", "./packages/shared"],
   "nodeModulesDir": "auto",
   "tasks": {
-    "dev": "deno task api:dev & deno task web:dev",
+    "dev": "docker compose up -d rabbitmq && (deno task api:dev & deno task web:dev; wait)",
     "api:dev": "deno task --cwd apps/api dev",
     "web:dev": "deno task --cwd apps/web dev"
   }
