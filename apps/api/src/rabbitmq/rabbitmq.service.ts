@@ -2,7 +2,7 @@ import { Injectable, OnModuleDestroy } from "@nestjs/common";
 import amqp from "amqplib";
 import { Buffer } from "node:buffer";
 
-const EXCHANGE_UPDATES = "game.updates";
+const EXCHANGE_UPDATES = "amq.topic";
 
 @Injectable()
 export class RabbitMQService implements OnModuleDestroy {
@@ -18,7 +18,10 @@ export class RabbitMQService implements OnModuleDestroy {
       const connection = await amqp.connect(url);
       this.conn = connection as any;
       this.channel = await connection.createChannel();
-      await this.channel.assertExchange(EXCHANGE_UPDATES, "topic", { durable: false });
+      // Only assert our own exchange; amq.topic is used by STOMP and may already exist
+      if (EXCHANGE_UPDATES !== "amq.topic") {
+        await this.channel.assertExchange(EXCHANGE_UPDATES, "topic", { durable: false });
+      }
     })();
     await this.initPromise;
   }
