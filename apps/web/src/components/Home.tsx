@@ -110,6 +110,7 @@ export function Home({ onSinglePlayer, onMultiplayer }: HomeProps) {
     ...baseButtonStyle,
     outline: "2px solid #0af",
     background: "#222",
+    color: "#fff",
   };
 
   return (
