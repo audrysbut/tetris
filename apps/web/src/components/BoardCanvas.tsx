@@ -111,6 +111,8 @@ export function BoardCanvas({
                     key={`piece-${rowIndex}-${colIndex}`}
                     x={x}
                     y={y}
+                    rx={4}
+                    ry={4}
                     width={size}
                     height={size}
                     fill={CELL_COLORS[currentPiece.type + 1]}
