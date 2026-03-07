@@ -219,13 +219,9 @@ export function hardDrop(state: GameState): GameState {
   let board = mergePiece(s.board, piece);
   const [newBoard, linesCleared] = clearLines(board);
   const addScore = scoreForLines(linesCleared);
-  const nextType = randomPieceType();
+  const nextType = s.nextPieceType;
   const spawnPos = spawnPosition(nextType);
-  const wouldCollide = collides(newBoard, {
-    type: nextType,
-    rotation: 0,
-    position: spawnPos,
-  });
+  const wouldCollide = wouldSpawnCollide(newBoard, nextType);
   return {
     ...s,
     board: newBoard,
