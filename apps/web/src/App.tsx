@@ -21,7 +21,10 @@ function App() {
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          background: "#1a1a1a",
+          // background: "#1a1a1a",
+          backgroundImage: "url('https://picsum.photos/id/440/1704/526')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           color: "#eee",
         }}
       >

@@ -47,7 +47,7 @@ export function BoardCanvas({
       aria-label="Tetris board"
     >
       {/* Background */}
-      <rect width={svgW} height={svgH} fill="#111" />
+      <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.85)" />
       {/* Board cells */}
       {board.map((row: number[], rowIndex: number) =>
         row.map((value: number, colIndex: number) => {
@@ -116,6 +116,8 @@ export function BoardCanvas({
                     width={size}
                     height={size}
                     fill={CELL_COLORS[currentPiece.type + 1]}
+                    stroke="rgba(255,255,255,0.7)"
+                    strokeWidth={2}
                   />
                 );
               })
