@@ -23,7 +23,7 @@ export function SinglePlayerGame() {
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [state.gameOver, isPaused, state.currentPiece, lastTickAt, dropIntervalMs]);
+  }, [state.gameOver, isPaused, lastTickAt, dropIntervalMs]);
 
   const handleAction = useCallback(
     (action: KeyAction) => {
