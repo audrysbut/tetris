@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 import type { GameState } from "@shared/mod";
 
-const CELL_SIZE = 32;
+const CELL_SIZE = 36;
 const BORDER = 1;
 
 const COLORS: string[] = [

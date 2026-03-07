@@ -40,8 +40,8 @@ export function SinglePlayerGame() {
   );
 
   return (
-    <div style={{ padding: 16, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-      <h2 style={{ marginTop: 0 }}>Single Player</h2>
+    <div style={{ padding: 8, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+      <h2 style={{ marginTop: 0, marginBottom: 4, fontSize: 18 }}>Single Player</h2>
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         <div>
           <HUD
@@ -52,7 +52,7 @@ export function SinglePlayerGame() {
             isPaused={isPaused}
           />
           <BoardCanvas state={state} dropProgress={dropProgress} />
-          <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
+          <div style={{ marginTop: 4, display: "flex", gap: 8 }}>
             <button type="button" onClick={reset}>
               {state.gameOver ? "Play again" : "Restart"}
             </button>
@@ -65,7 +65,7 @@ export function SinglePlayerGame() {
         </div>
         <NextPiece nextPieceType={state.nextPieceType} />
       </div>
-      <p style={{ fontSize: 12, color: "#666", marginTop: 12 }}>
+      <p style={{ fontSize: 11, color: "#666", marginTop: 6 }}>
         Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause
       </p>
     </div>

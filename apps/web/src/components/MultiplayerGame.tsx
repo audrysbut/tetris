@@ -74,23 +74,23 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
     : emptyState;
 
   return (
-    <div style={{ padding: 16 }}>
-      <button type="button" onClick={onBack} style={{ marginBottom: 8 }}>
+    <div style={{ padding: 8 }}>
+      <button type="button" onClick={onBack} style={{ marginBottom: 4 }}>
         ← Back
       </button>
       {!connected && <p>Connecting to game… (reconnecting if connection was lost)</p>}
       {connected && !gameStarted && !room?.event && (
         <>
-          <div style={{ marginTop: 16, padding: 16, background: "#f0f4f8", borderRadius: 8, maxWidth: 400 }}>
-            <p style={{ margin: "0 0 8px", fontWeight: "bold" }}>Share this match ID with your opponent:</p>
+          <div style={{ marginTop: 8, padding: 12, background: "#f0f4f8", borderRadius: 8, maxWidth: 400 }}>
+            <p style={{ margin: "0 0 6px", fontWeight: "bold", fontSize: 14 }}>Share this match ID with your opponent:</p>
             <p
               style={{
                 margin: 0,
-                fontSize: 24,
+                fontSize: 20,
                 fontFamily: "monospace",
                 letterSpacing: 2,
                 userSelect: "all",
-                padding: "12px 16px",
+                padding: "8px 12px",
                 background: "#fff",
                 borderRadius: 4,
                 border: "1px solid #ccc",
@@ -107,22 +107,22 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
                   setTimeout(() => setCopied(false), 2000);
                 });
               }}
-              style={{ marginTop: 8, padding: "6px 12px" }}
+              style={{ marginTop: 6, padding: "4px 10px", fontSize: 13 }}
             >
               {copied ? "Copied!" : "Copy match ID"}
             </button>
-            <p style={{ margin: "8px 0 0", fontSize: 13, color: "#555" }}>
+            <p style={{ margin: "6px 0 0", fontSize: 12, color: "#555" }}>
               They can enter this in the lobby under “Join match”.
             </p>
           </div>
-          <p style={{ marginTop: 12 }}>Waiting for opponent to join…</p>
+          <p style={{ marginTop: 8, fontSize: 13 }}>Waiting for opponent to join…</p>
         </>
       )}
       {connected && (gameStarted || room?.event === "gameStart") && (
         <>
-          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <div>
-              <h3 style={{ margin: "0 0 8px" }}>You (Player {playerId})</h3>
+              <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>You (Player {playerId})</h3>
               <HUD
                 score={myState.score}
                 lines={myState.lines}
@@ -133,7 +133,7 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
               <BoardCanvas state={myState} />
             </div>
             <div>
-              <h3 style={{ margin: "0 0 8px" }}>Opponent</h3>
+              <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>Opponent</h3>
               <HUD
                 score={oppState.score}
                 lines={oppState.lines}
@@ -145,7 +145,7 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
             </div>
           </div>
           {room?.status === "finished" && room.winnerId != null && (
-            <p style={{ marginTop: 16, fontSize: 18, fontWeight: "bold" }}>
+            <p style={{ marginTop: 8, fontSize: 16, fontWeight: "bold" }}>
               {room.winnerId === playerId ? "You win!" : "You lose!"} Winner: highest score when someone topped out.
             </p>
           )}

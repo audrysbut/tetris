@@ -12,7 +12,7 @@ interface HUDProps {
 
 export function HUD({ score, lines, level, gameOver, isPaused }: HUDProps) {
   return (
-    <div style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 16 }}>
+    <div style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 13 }}>
       <div>Score: {score}</div>
       <div>Lines: {lines}</div>
       <div>Level: {level}</div>
@@ -35,8 +35,8 @@ export function NextPiece({ nextPieceType }: NextPieceProps) {
   const colors = ["#000", "#00f0f0", "#f0f000", "#a000f0", "#00f000", "#f00000", "#0000f0", "#f0a000"];
   const color = colors[nextPieceType + 1];
   return (
-    <div style={{ marginLeft: 16 }}>
-      <div style={{ fontSize: 12, marginBottom: 4 }}>Next</div>
+    <div style={{ marginLeft: 12 }}>
+      <div style={{ fontSize: 11, marginBottom: 2 }}>Next</div>
       <div
         style={{
           display: "grid",

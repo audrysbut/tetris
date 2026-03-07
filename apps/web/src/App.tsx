@@ -17,7 +17,7 @@ function App() {
         <button
           type="button"
           onClick={() => setScreen("home")}
-          style={{ position: "absolute", top: 16, left: 16 }}
+          style={{ position: "absolute", top: 8, left: 8 }}
         >
           ← Back
         </button>
@@ -41,7 +41,7 @@ function App() {
         <button
           type="button"
           onClick={() => setScreen("home")}
-          style={{ position: "absolute", top: 16, left: 16 }}
+          style={{ position: "absolute", top: 8, left: 8 }}
         >
           ← Back
         </button>
