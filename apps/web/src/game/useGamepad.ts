@@ -25,6 +25,7 @@ export function useGamepad(
     buttons: Array(20).fill(false) as boolean[],
     axisLeftRight: 0,
     axisDown: 0,
+    axisUp: 0,
   });
 
   const poll = useCallback(() => {
@@ -55,7 +56,9 @@ export function useGamepad(
       (axis1 > AXIS_DEAD_ZONE && axis1 >= AXIS_THRESHOLD) ||
       (axis7 > AXIS_THRESHOLD);
     const rotate = !!buttons[0] || !!buttons[1] || !!buttons[2];
-    const hardDrop = !!buttons[3] || !!buttons[5];
+    const hardDrop = !!buttons[3] || !!buttons[5] || !!buttons[12] ||
+      (axis7 < -AXIS_DEAD_ZONE && axis7 <= -AXIS_THRESHOLD) ||
+      (axis1 < -AXIS_THRESHOLD);
     const pause = !!buttons[9];
 
     const fire = (action: KeyAction) => onActionRef.current(action);
@@ -67,13 +70,15 @@ export function useGamepad(
     if (down && !prev.buttons[13] && !prev.buttons[1] && !(prev.axisDown >= AXIS_THRESHOLD))
       fire("softDrop");
     if (rotate && !(prev.buttons[0] || prev.buttons[1] || prev.buttons[2])) fire("rotate");
-    if (hardDrop && !(prev.buttons[3] || prev.buttons[5])) fire("hardDrop");
+    if (hardDrop && !(prev.buttons[3] || prev.buttons[5] || prev.buttons[12]) &&
+        !(prev.axisUp <= -AXIS_THRESHOLD)) fire("hardDrop");
     if (pause && !prev.buttons[9]) fire("pause");
 
     prevRef.current = {
       buttons,
       axisLeftRight: Math.abs(axis0) >= AXIS_THRESHOLD ? axis0 : Math.abs(axis6) >= AXIS_THRESHOLD ? axis6 : 0,
       axisDown: axis1 >= AXIS_THRESHOLD ? axis1 : axis7 >= AXIS_THRESHOLD ? axis7 : 0,
+      axisUp: axis7 <= -AXIS_THRESHOLD ? axis7 : axis1 <= -AXIS_THRESHOLD ? axis1 : 0,
     };
   }, [enabled]);
 

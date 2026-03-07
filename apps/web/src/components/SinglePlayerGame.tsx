@@ -70,7 +70,7 @@ export function SinglePlayerGame() {
         <NextPiece nextPieceType={state.nextPieceType} />
       </div>
       <p style={{ fontSize: 11, color: "#666", marginTop: 6 }}>
-        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause. Gamepad: D-pad or left stick to move, A rotate, B soft drop, Y hard drop, Start pause. (If gamepad does nothing, click the game area then press any gamepad button.)
+        Controls: ← → move, ↑ rotate, ↓ soft drop, Space hard drop, P pause. Gamepad: D-pad or left stick to move, D-pad up hard drop, A rotate, B soft drop, Y hard drop, Start pause. (If gamepad does nothing, click the game area then press any gamepad button.)
       </p>
     </div>
   );
