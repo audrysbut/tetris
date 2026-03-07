@@ -42,8 +42,11 @@ export class GameConsumerService {
           (toPublish as any).winnerId = room.winnerId;
         }
         this.rabbit.publishUpdate(matchId, toPublish);
-      } catch (_e) {
-        // ignore parse/apply errors
+      } catch (e) {
+        const snippet = msg?.content
+          ? new TextDecoder().decode(msg.content).slice(0, 200)
+          : "";
+        console.error("[GameConsumer] Parse/apply failed", { matchId, snippet, err: e });
       }
     });
   }

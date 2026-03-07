@@ -70,3 +70,15 @@ export const PIECE_TYPES: PieceType[] = [0, 1, 2, 3, 4, 5, 6];
 export function randomPieceType(): PieceType {
   return PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
 }
+
+/** Cell colors for rendering: index 0 = empty, 1–7 = I, O, T, S, Z, J, L */
+export const CELL_COLORS: string[] = [
+  "#000",
+  "#00f0f0", // I
+  "#f0f000", // O
+  "#a000f0", // T
+  "#00f000", // S
+  "#f00000", // Z
+  "#0000f0", // J
+  "#f0a000", // L
+];

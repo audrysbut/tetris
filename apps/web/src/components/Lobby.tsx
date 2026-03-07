@@ -13,6 +13,7 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState("");
   const [created, setCreated] = useState<CreateMatchResult | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleCreate = async () => {
     setError("");
@@ -62,7 +63,21 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
         </button>
         {created && (
           <div style={{ marginTop: 8, padding: 8, background: "#eee", borderRadius: 4 }}>
-            <p style={{ margin: 0, fontWeight: "bold" }}>Match ID: {created.matchId}</p>
+            <p style={{ margin: 0, fontWeight: "bold" }}>
+              Match ID: {created.matchId}
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(created.matchId).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  });
+                }}
+                style={{ marginLeft: 8, padding: "2px 8px", fontSize: 12 }}
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </p>
             <p style={{ margin: "4px 0 0", fontSize: 12, color: "#666" }}>
               Share this ID with the other player. When they join, you’ll both enter the game.
             </p>
@@ -85,10 +100,6 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
       </section>
 
       {error && <p style={{ color: "#c00" }}>{error}</p>}
-
-      <button type="button" onClick={onBack}>
-        ← Back to home
-      </button>
     </div>
   );
 }

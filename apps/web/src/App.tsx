@@ -3,6 +3,7 @@ import { Home } from "./components/Home.tsx";
 import { SinglePlayerGame } from "./components/SinglePlayerGame.tsx";
 import { Lobby } from "./components/Lobby.tsx";
 import { MultiplayerGame } from "./components/MultiplayerGame.tsx";
+import { BackButton } from "./components/BackButton.tsx";
 import type { JoinMatchResult } from "./api/match.ts";
 
 type Screen = "home" | "single" | "lobby" | "multiplayer";
@@ -14,13 +15,7 @@ function App() {
   if (screen === "single") {
     return (
       <>
-        <button
-          type="button"
-          onClick={() => setScreen("home")}
-          style={{ position: "absolute", top: 8, left: 8 }}
-        >
-          ← Back
-        </button>
+        <BackButton onClick={() => setScreen("home")} />
         <SinglePlayerGame />
       </>
     );
@@ -38,13 +33,7 @@ function App() {
   if (screen === "lobby") {
     return (
       <>
-        <button
-          type="button"
-          onClick={() => setScreen("home")}
-          style={{ position: "absolute", top: 8, left: 8 }}
-        >
-          ← Back
-        </button>
+        <BackButton onClick={() => setScreen("home")} />
         <Lobby
           onBack={() => setScreen("home")}
           onJoinGame={(result) => { setJoinResult(result); setScreen("multiplayer"); }}

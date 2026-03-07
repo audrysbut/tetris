@@ -1,20 +1,24 @@
-import { useState, useCallback, useEffect } from "react";
+import type {
+  CreateMatchResult,
+  JoinMatchResult,
+  MatchErrorResponse,
+} from "@shared/mod";
 
 const API_URL = import.meta.env?.VITE_API_URL ?? "http://localhost:3000";
 
-export interface CreateMatchResult {
-  matchId: string;
-  actionsDestination: string;
-  updatesDestination: string;
+function isJoinMatchResult(data: unknown): data is JoinMatchResult {
+  if (!data || typeof data !== "object") return false;
+  const o = data as Record<string, unknown>;
+  return (
+    typeof o.matchId === "string" &&
+    (o.playerId === 1 || o.playerId === 2) &&
+    typeof o.actionsDestination === "string" &&
+    typeof o.updatesDestination === "string" &&
+    typeof o.gameStarted === "boolean"
+  );
 }
 
-export interface JoinMatchResult {
-  matchId: string;
-  playerId: 1 | 2;
-  actionsDestination: string;
-  updatesDestination: string;
-  gameStarted: boolean;
-}
+export type { CreateMatchResult, JoinMatchResult };
 
 export async function createMatch(): Promise<CreateMatchResult> {
   const res = await fetch(`${API_URL}/match/create`, { method: "POST" });
@@ -22,13 +26,18 @@ export async function createMatch(): Promise<CreateMatchResult> {
   return res.json();
 }
 
-export async function joinMatch(matchId: string): Promise<JoinMatchResult | { error: string }> {
+export async function joinMatch(
+  matchId: string
+): Promise<JoinMatchResult | MatchErrorResponse> {
   const res = await fetch(`${API_URL}/match/join`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ matchId }),
   });
-  const data = await res.json();
-  if (!res.ok) return data;
-  return data as JoinMatchResult;
+  const data: unknown = await res.json();
+  if (!res.ok) return data as MatchErrorResponse;
+  if (!isJoinMatchResult(data)) {
+    throw new Error("Invalid response from server");
+  }
+  return data;
 }

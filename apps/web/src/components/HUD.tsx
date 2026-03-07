@@ -1,6 +1,6 @@
-import { getShape } from "@shared/mod";
+import { getShape, CELL_COLORS } from "@shared/mod";
 import { BoardCanvas } from "./BoardCanvas.tsx";
-import type { GameState } from "@shared/mod";
+import type { GameState, PieceType } from "@shared/mod";
 
 interface HUDProps {
   score: number;
@@ -23,17 +23,16 @@ export function HUD({ score, lines, level, gameOver, isPaused }: HUDProps) {
 }
 
 interface NextPieceProps {
-  nextPieceType: number;
+  nextPieceType: PieceType;
 }
 
 const NEXT_SIZE = 16;
 
 export function NextPiece({ nextPieceType }: NextPieceProps) {
-  const shape = getShape(nextPieceType as any, 0);
+  const shape = getShape(nextPieceType, 0);
   const rows = shape.length;
   const cols = shape[0].length;
-  const colors = ["#000", "#00f0f0", "#f0f000", "#a000f0", "#00f000", "#f00000", "#0000f0", "#f0a000"];
-  const color = colors[nextPieceType + 1];
+  const color = CELL_COLORS[nextPieceType + 1];
   return (
     <div style={{ marginLeft: 12 }}>
       <div style={{ fontSize: 11, marginBottom: 2 }}>Next</div>

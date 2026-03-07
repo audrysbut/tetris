@@ -1,19 +1,8 @@
-import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
+import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT, CELL_COLORS } from "@shared/mod";
 import type { GameState } from "@shared/mod";
 
 const CELL_SIZE = 36;
 const BORDER = 1;
-
-const COLORS: string[] = [
-  "#000",
-  "#00f0f0", // I
-  "#f0f000", // O
-  "#a000f0", // T
-  "#00f000", // S
-  "#f00000", // Z
-  "#0000f0", // J
-  "#f0a000", // L
-];
 
 interface BoardCanvasProps {
   state: GameState;
@@ -74,7 +63,7 @@ export function BoardCanvas({
               ry={4}
               width={size}
               height={size}
-              fill={COLORS[value] ?? "#333"}
+              fill={CELL_COLORS[value] ?? "#333"}
             />
           );
         })
@@ -124,7 +113,7 @@ export function BoardCanvas({
                     y={y}
                     width={size}
                     height={size}
-                    fill={COLORS[currentPiece.type + 1]}
+                    fill={CELL_COLORS[currentPiece.type + 1]}
                   />
                 );
               })

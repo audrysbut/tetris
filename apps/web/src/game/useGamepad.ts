@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { getFirstGamepad } from "./gamepad.ts";
 import type { KeyAction } from "./useKeyboard.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
@@ -9,16 +10,6 @@ const SOFT_DROP_REPEAT_MS = 130;
 const RELEASE_COOLDOWN_MS = 180;
 /** After releasing left or right, ignore both horizontal directions to avoid opposite-direction stick overshoot */
 const RELEASE_HORIZONTAL_COOLDOWN_MS = 180;
-
-function getFirstGamepad(): Gamepad | null {
-  const list = navigator.getGamepads?.();
-  if (!list) return null;
-  for (let i = 0; i < list.length; i++) {
-    const gp = list[i];
-    if (gp != null) return gp;
-  }
-  return null;
-}
 
 export function useGamepad(
   onAction: (action: KeyAction) => void,

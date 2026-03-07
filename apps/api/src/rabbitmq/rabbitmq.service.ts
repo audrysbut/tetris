@@ -4,9 +4,14 @@ import { Buffer } from "node:buffer";
 
 const EXCHANGE_UPDATES = "amq.topic";
 
+/** Minimal type for amqplib connection so we can call close() without using any */
+interface AmqpConnection {
+  close(): Promise<void>;
+}
+
 @Injectable()
 export class RabbitMQService implements OnModuleDestroy {
-  private conn: amqp.Channel | null = null;
+  private conn: AmqpConnection | null = null;
   private channel: amqp.Channel | null = null;
   private initPromise: Promise<void> | null = null;
 
@@ -14,13 +19,18 @@ export class RabbitMQService implements OnModuleDestroy {
     if (this.channel) return;
     if (this.initPromise) return this.initPromise;
     this.initPromise = (async () => {
-      const url = Deno.env.get("RABBITMQ_URL") ?? "amqp://guest:guest@localhost:5672";
-      const connection = await amqp.connect(url);
-      this.conn = connection as any;
-      this.channel = await connection.createChannel();
-      // Only assert our own exchange; amq.topic is used by STOMP and may already exist
-      if (EXCHANGE_UPDATES !== "amq.topic") {
-        await this.channel.assertExchange(EXCHANGE_UPDATES, "topic", { durable: false });
+      try {
+        const url = Deno.env.get("RABBITMQ_URL") ?? "amqp://guest:guest@localhost:5672";
+        const connection = await amqp.connect(url);
+        this.conn = connection as unknown as AmqpConnection;
+        this.channel = await connection.createChannel();
+        // Only assert our own exchange; amq.topic is used by STOMP and may already exist
+        if (EXCHANGE_UPDATES !== "amq.topic") {
+          await this.channel.assertExchange(EXCHANGE_UPDATES, "topic", { durable: false });
+        }
+      } catch (err) {
+        console.error("[RabbitMQ] Connection or channel failed:", err);
+        throw err;
       }
     })();
     await this.initPromise;
@@ -28,7 +38,7 @@ export class RabbitMQService implements OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     if (this.channel) await this.channel.close().catch(() => {});
-    if (this.conn) await (this.conn as any).close().catch(() => {});
+    if (this.conn) await this.conn.close().catch(() => {});
   }
 
   /** Assert queue for match actions (clients send here via STOMP) */

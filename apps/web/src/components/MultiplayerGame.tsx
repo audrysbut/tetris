@@ -4,6 +4,7 @@ import { useKeyboard } from "../game/useKeyboard.ts";
 import { useGamepad } from "../game/useGamepad.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD } from "./HUD.tsx";
+import { BackButton } from "./BackButton.tsx";
 import { parseRoomUpdate, toGameState } from "../api/types.ts";
 import type { JoinMatchResult } from "../api/match.ts";
 import type { KeyAction } from "../game/useKeyboard.ts";
@@ -28,20 +29,30 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
   const { matchId, playerId, actionsDestination, updatesDestination, gameStarted } = joinResult;
   const [room, setRoom] = useState<ReturnType<typeof parseRoomUpdate>>(null);
   const [connected, setConnected] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const { connect, disconnect, subscribe, send } = useWebStomp();
   const unsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    setConnectionError(null);
     const client = connect(
       () => {
         setConnected(true);
+        setConnectionError(null);
         unsubRef.current = subscribe(updatesDestination, (body) => {
           const next = parseRoomUpdate(body);
-          if (next) setRoom(next);
+          if (next) {
+            setRoom(next);
+          } else if (body && body.trim() !== "") {
+            setConnectionError("Invalid update from server");
+          }
         });
       },
-      () => setConnected(false)
+      () => {
+        setConnected(false);
+        setConnectionError("Connection failed");
+      }
     );
     return () => {
       unsubRef.current?.();
@@ -80,10 +91,11 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
 
   return (
     <div style={{ padding: 8 }}>
-      <button type="button" onClick={onBack} style={{ marginBottom: 4 }}>
-        ← Back
-      </button>
-      {!connected && <p>Connecting to game… (reconnecting if connection was lost)</p>}
+      <BackButton onClick={onBack} />
+      {connectionError && (
+        <p style={{ color: "#c00", marginBottom: 8 }}>{connectionError}</p>
+      )}
+      {!connected && !connectionError && <p>Connecting to game… (reconnecting if connection was lost)</p>}
       {connected && !gameStarted && !room?.event && (
         <>
           <div style={{ marginTop: 8, padding: 12, background: "#f0f4f8", borderRadius: 8, maxWidth: 400 }}>

@@ -2,20 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { RabbitMQService } from "../rabbitmq/rabbitmq.service.ts";
 import { GameRoomService } from "../game/game-room.service.ts";
 import { GameConsumerService } from "../game/game-consumer.service.ts";
-
-export interface CreateMatchResult {
-  matchId: string;
-  actionsDestination: string;
-  updatesDestination: string;
-}
-
-export interface JoinMatchResult {
-  matchId: string;
-  playerId: 1 | 2;
-  actionsDestination: string;
-  updatesDestination: string;
-  gameStarted: boolean;
-}
+import type { CreateMatchResult, JoinMatchResult } from "shared";
 
 interface MatchMeta {
   matchId: string;

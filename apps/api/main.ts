@@ -4,4 +4,5 @@ import { AppModule } from "./app.module.ts";
 
 const app = await NestFactory.create(AppModule);
 app.enableCors();
-await app.listen(3000);
+const port = Deno.env.get("PORT") ?? "3000";
+await app.listen(Number(port));
