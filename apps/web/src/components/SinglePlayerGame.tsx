@@ -78,6 +78,7 @@ export function SinglePlayerGame() {
         flex: 1,
         minHeight: 0,
         padding: 8,
+        paddingLeft: 72,
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
