@@ -26,7 +26,7 @@ export class MatchService {
     this.matches.set(matchId, { matchId, playerCount: 0 });
     return {
       matchId,
-      actionsDestination: `/queue/match.${matchId}.actions`,
+      actionsDestination: `/amq/queue/match.${matchId}.actions`,
       updatesDestination: `/topic/match.${matchId}.updates`,
     };
   }
@@ -47,7 +47,7 @@ export class MatchService {
     return {
       matchId,
       playerId,
-      actionsDestination: `/queue/match.${matchId}.actions`,
+      actionsDestination: `/amq/queue/match.${matchId}.actions`,
       updatesDestination: `/topic/match.${matchId}.updates`,
       gameStarted,
     };

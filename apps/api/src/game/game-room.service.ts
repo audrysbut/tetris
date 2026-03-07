@@ -73,7 +73,8 @@ export class GameRoomService {
     return DEFAULT_DROP_MS;
   }
 
-  /** Apply action for a player; update room; return new room state and whether match ended */
+  /** Apply action for a player; update room; return new room state and whether match ended.
+   * Gravity is handled by the interval (tickGravity); we do not tick here so each keypress doesn't drop the piece. */
   applyPlayerAction(
     matchId: string,
     playerId: 1 | 2,
@@ -96,22 +97,7 @@ export class GameRoomService {
       else room.player2 = locked;
     }
 
-    // One gravity tick for both players (move-driven)
-    for (const id of [1, 2] as const) {
-      const s = id === 1 ? room.player1 : room.player2;
-      if (s.gameOver || !s.currentPiece) continue;
-      const ticked = tick(s);
-      if (ticked) {
-        if (id === 1) room.player1 = ticked;
-        else room.player2 = ticked;
-      } else {
-        const locked = lockPiece(s);
-        if (id === 1) room.player1 = locked;
-        else room.player2 = locked;
-      }
-    }
-
-    // Check for game over
+    // Check for game over (e.g. after hard drop or lock)
     const p1 = room.player1;
     const p2 = room.player2;
     if (p1.gameOver || p2.gameOver) {

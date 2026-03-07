@@ -114,7 +114,9 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
       {connectionError && (
         <p style={{ color: "#c00", marginBottom: 8 }}>{connectionError}</p>
       )}
-      {!connected && !connectionError && <p>Connecting to game… (reconnecting if connection was lost)</p>}
+      {!connected && !connectionError && (
+        <p>Connecting to RabbitMQ… This may take up to 45 seconds. If it takes longer, ensure RabbitMQ is running (e.g. <code>docker compose up -d rabbitmq</code>).</p>
+      )}
       {showWaiting && (
         <>
           <div style={{ marginTop: 8, padding: 12, background: "#f0f4f8", borderRadius: 8, maxWidth: 400 }}>

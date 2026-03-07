@@ -22,8 +22,17 @@ export type { CreateMatchResult, JoinMatchResult };
 
 export async function createMatch(): Promise<CreateMatchResult> {
   const res = await fetch(`${API_URL}/match/create`, { method: "POST" });
-  if (!res.ok) throw new Error("Failed to create match");
-  return res.json();
+  const data: unknown = await res.json().catch(() => null);
+  if (!res.ok) {
+    const msg = data && typeof data === "object" && "error" in data
+      ? (data as { error: string }).error
+      : `Failed to create match (${res.status})`;
+    throw new Error(msg);
+  }
+  if (!data || typeof data !== "object" || typeof (data as CreateMatchResult).matchId !== "string") {
+    throw new Error("Invalid response from server");
+  }
+  return data as CreateMatchResult;
 }
 
 export async function joinMatch(

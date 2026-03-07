@@ -41,10 +41,6 @@ export function useWebStomp(config: StompConfig = {}) {
       clientRef.current = client;
       return client;
     },
-      client.activate();
-      clientRef.current = client;
-      return client;
-    },
     [url, user, pass]
   );
 

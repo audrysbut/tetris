@@ -17,13 +17,21 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
 
   const handleCreate = async () => {
     setError("");
+    setCreated(null);
     setCreating(true);
     try {
       const result = await createMatch();
-      setCreated(result);
+      if (!result?.matchId) {
+        setError("Invalid response from server (missing matchId)");
+        return;
+      }
       const joinResult = await joinMatch(result.matchId);
-      if (!("error" in joinResult)) onJoinGame(joinResult);
-      else setError(joinResult.error);
+      if ("error" in joinResult) {
+        setError(joinResult.error);
+        return;
+      }
+      setCreated(result);
+      onJoinGame(joinResult);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create match");
     } finally {
