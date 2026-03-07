@@ -2,9 +2,13 @@ import { useEffect, useRef, useCallback } from "react";
 import type { KeyAction } from "./useKeyboard.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
-const AXIS_THRESHOLD = 0.5;
+const AXIS_THRESHOLD = 0.6;
 const REPEAT_MS = 130;
 const SOFT_DROP_REPEAT_MS = 130;
+/** Ignore same-direction input for this long after release to avoid overshoot (stick/d-pad bounce or lag) */
+const RELEASE_COOLDOWN_MS = 180;
+/** After releasing left or right, ignore both horizontal directions to avoid opposite-direction stick overshoot */
+const RELEASE_HORIZONTAL_COOLDOWN_MS = 180;
 
 function getFirstGamepad(): Gamepad | null {
   const list = navigator.getGamepads?.();
@@ -33,6 +37,10 @@ export function useGamepad(
     lastLeft: 0,
     lastRight: 0,
     lastDown: 0,
+    releasedLeftAt: 0,
+    releasedRightAt: 0,
+    releasedDownAt: 0,
+    releasedHorizontalAt: 0,
   });
 
   const poll = useCallback(() => {
@@ -76,27 +84,48 @@ export function useGamepad(
     const now = Date.now();
 
     if (left) {
-      if (!wasLeft || now - repeatRef.current.lastLeft >= REPEAT_MS) {
+      const cooldownHorizontal = repeatRef.current.releasedHorizontalAt && (now - repeatRef.current.releasedHorizontalAt) < RELEASE_HORIZONTAL_COOLDOWN_MS;
+      const cooldownLeft = repeatRef.current.releasedLeftAt && (now - repeatRef.current.releasedLeftAt) < RELEASE_COOLDOWN_MS;
+      if (!cooldownHorizontal && !cooldownLeft && (!wasLeft || now - repeatRef.current.lastLeft >= REPEAT_MS)) {
         fire("left");
         repeatRef.current.lastLeft = now;
+        repeatRef.current.releasedLeftAt = 0;
+        repeatRef.current.releasedHorizontalAt = 0;
       }
     } else {
+      if (repeatRef.current.lastLeft !== 0) {
+        repeatRef.current.releasedLeftAt = now;
+        repeatRef.current.releasedHorizontalAt = now;
+      }
       repeatRef.current.lastLeft = 0;
     }
     if (right) {
-      if (!wasRight || now - repeatRef.current.lastRight >= REPEAT_MS) {
+      const cooldownHorizontal = repeatRef.current.releasedHorizontalAt && (now - repeatRef.current.releasedHorizontalAt) < RELEASE_HORIZONTAL_COOLDOWN_MS;
+      const cooldownRight = repeatRef.current.releasedRightAt && (now - repeatRef.current.releasedRightAt) < RELEASE_COOLDOWN_MS;
+      if (!cooldownHorizontal && !cooldownRight && (!wasRight || now - repeatRef.current.lastRight >= REPEAT_MS)) {
         fire("right");
         repeatRef.current.lastRight = now;
+        repeatRef.current.releasedRightAt = 0;
+        repeatRef.current.releasedHorizontalAt = 0;
       }
     } else {
+      if (repeatRef.current.lastRight !== 0) {
+        repeatRef.current.releasedRightAt = now;
+        repeatRef.current.releasedHorizontalAt = now;
+      }
       repeatRef.current.lastRight = 0;
     }
     if (down) {
-      if (!wasDown || now - repeatRef.current.lastDown >= SOFT_DROP_REPEAT_MS) {
+      const cooldownDown = repeatRef.current.releasedDownAt && (now - repeatRef.current.releasedDownAt) < RELEASE_COOLDOWN_MS;
+      if (!cooldownDown && (!wasDown || now - repeatRef.current.lastDown >= SOFT_DROP_REPEAT_MS)) {
         fire("softDrop");
         repeatRef.current.lastDown = now;
+        repeatRef.current.releasedDownAt = 0;
       }
     } else {
+      if (repeatRef.current.lastDown !== 0) {
+        repeatRef.current.releasedDownAt = now;
+      }
       repeatRef.current.lastDown = 0;
     }
 
