@@ -4,6 +4,7 @@ import {
   applyAction,
   tick,
   lockPiece,
+  DEFAULT_DROP_MS,
   type GameState,
   type GameAction,
 } from "shared";
@@ -40,6 +41,36 @@ export class GameRoomService {
     const room = this.rooms.get(matchId);
     if (!room || room.status !== "waiting") return;
     room.status = "playing";
+  }
+
+  /** Run one gravity tick for both players; update room; return room or null if not playing. Caller should publish. */
+  tickGravity(matchId: string): RoomState | null {
+    const room = this.rooms.get(matchId);
+    if (!room || room.status !== "playing") return null;
+    for (const id of [1, 2] as const) {
+      const s = id === 1 ? room.player1 : room.player2;
+      if (s.gameOver || !s.currentPiece) continue;
+      const ticked = tick(s);
+      if (ticked) {
+        if (id === 1) room.player1 = ticked;
+        else room.player2 = ticked;
+      } else {
+        const locked = lockPiece(s);
+        if (id === 1) room.player1 = locked;
+        else room.player2 = locked;
+      }
+    }
+    const p1 = room.player1;
+    const p2 = room.player2;
+    if (p1.gameOver || p2.gameOver) {
+      room.status = "finished";
+      room.winnerId = p1.score >= p2.score ? 1 : 2;
+    }
+    return room;
+  }
+
+  getDropIntervalMs(): number {
+    return DEFAULT_DROP_MS;
   }
 
   /** Apply action for a player; update room; return new room state and whether match ended */

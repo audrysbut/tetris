@@ -28,8 +28,19 @@ export function useWebStomp(config: StompConfig = {}) {
         },
         reconnectDelay: 2000,
         onConnect: () => onConnect?.(),
-        onStompError: (frame) => onError?.(new Event(frame.headers?.message ?? "STOMP error")),
+        onStompError: (frame) => onError?.(new Event(frame?.headers?.message ?? "STOMP error")),
+        onWebSocketError: (ev: Event) => onError?.(ev),
+        onWebSocketClose: (ev: { code?: number; reason?: string }) => {
+          const isNormalClose = ev?.code === 1000;
+          if (!isNormalClose) {
+            onError?.(new Event(ev?.reason ?? `WebSocket closed (code ${ev?.code ?? "?"})`));
+          }
+        },
       });
+      client.activate();
+      clientRef.current = client;
+      return client;
+    },
       client.activate();
       clientRef.current = client;
       return client;

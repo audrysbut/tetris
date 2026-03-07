@@ -33,11 +33,19 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
   const [copied, setCopied] = useState(false);
   const { connect, disconnect, subscribe, send } = useWebStomp();
   const unsubRef = useRef<(() => void) | null>(null);
+  const gameAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setConnectionError(null);
-    const client = connect(
+    const timeoutMs = 45000; // Allow slow RabbitMQ/WebSocket (logs showed ~34s connect in some envs)
+    const timeoutId = setTimeout(() => {
+      setConnectionError((prev) =>
+        prev ? prev : "Connection timed out. Is RabbitMQ running? Start it with: docker compose up -d rabbitmq"
+      );
+    }, timeoutMs);
+    const _client = connect(
       () => {
+        clearTimeout(timeoutId);
         setConnected(true);
         setConnectionError(null);
         unsubRef.current = subscribe(updatesDestination, (body) => {
@@ -50,11 +58,13 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
         });
       },
       () => {
+        clearTimeout(timeoutId);
         setConnected(false);
         setConnectionError("Connection failed");
       }
     );
     return () => {
+      clearTimeout(timeoutId);
       unsubRef.current?.();
       disconnect();
     };
@@ -79,8 +89,17 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
     [room, sendAction]
   );
 
-  useKeyboard(handleAction, connected && room?.status === "playing");
-  useGamepad(handleAction, connected && room?.status === "playing");
+  const gameActive = room?.status === "playing" || room?.status === "finished";
+  const showGame = connected && (gameStarted || room?.event === "gameStart" || gameActive);
+  const showWaiting = connected && !gameStarted && !gameActive && room?.event !== "gameStart";
+
+  useKeyboard(handleAction, connected && gameActive);
+  useGamepad(handleAction, connected && gameActive);
+
+  // Focus game area when game becomes active so keyboard/gamepad work (e.g. after joining)
+  useEffect(() => {
+    if (gameActive && connected) gameAreaRef.current?.focus();
+  }, [gameActive, connected]);
 
   const myState: GameState = room
     ? toGameState(playerId === 1 ? room.player1 : room.player2)
@@ -96,7 +115,7 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
         <p style={{ color: "#c00", marginBottom: 8 }}>{connectionError}</p>
       )}
       {!connected && !connectionError && <p>Connecting to game… (reconnecting if connection was lost)</p>}
-      {connected && !gameStarted && !room?.event && (
+      {showWaiting && (
         <>
           <div style={{ marginTop: 8, padding: 12, background: "#f0f4f8", borderRadius: 8, maxWidth: 400 }}>
             <p style={{ margin: "0 0 6px", fontWeight: "bold", fontSize: 14 }}>Share this match ID with your opponent:</p>
@@ -135,8 +154,14 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
           <p style={{ marginTop: 8, fontSize: 13 }}>Waiting for opponent to join…</p>
         </>
       )}
-      {connected && (gameStarted || room?.event === "gameStart") && (
+      {showGame && (
         <>
+          <div
+            ref={gameAreaRef}
+            tabIndex={0}
+            style={{ outline: "none" }}
+            aria-label="Game area - use keyboard or gamepad to move pieces"
+          >
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <div>
               <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>You (Player {playerId})</h3>
@@ -166,6 +191,7 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
               {room.winnerId === playerId ? "You win!" : "You lose!"} Winner: highest score when someone topped out.
             </p>
           )}
+          </div>
         </>
       )}
     </div>
