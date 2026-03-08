@@ -2,16 +2,21 @@ import { getShape, CELL_COLORS } from "@shared/mod";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import type { GameState, PieceType } from "@shared/mod";
 
-interface HUDProps {
+export interface HUDProps {
   score: number;
   lines: number;
   level: number;
   gameOver: boolean;
   isPaused: boolean;
+  elapsedMs?: number;
 }
 
-export function HUD({ score, lines, level, gameOver, isPaused }: HUDProps) {
+export function HUD({ score, lines, level, gameOver, isPaused, elapsedMs }: HUDProps) {
   const textShadow = "0 1px 2px rgba(0,0,0,0.9), 0 0 4px #000";
+  const timeStr =
+    elapsedMs != null
+      ? `${Math.floor(elapsedMs / 60000)}:${Math.floor((elapsedMs % 60000) / 1000).toString().padStart(2, "0")}`
+      : null;
   return (
     <div
       style={{
@@ -25,6 +30,7 @@ export function HUD({ score, lines, level, gameOver, isPaused }: HUDProps) {
       <div>Score: {score}</div>
       <div>Lines: {lines}</div>
       <div>Level: {level}</div>
+      {timeStr != null && <div>Time: {timeStr}</div>}
       {gameOver && <div style={{ color: "#f66", fontWeight: "bold" }}>Game Over</div>}
       {isPaused && !gameOver && <div style={{ color: "#ffc" }}>Paused</div>}
     </div>

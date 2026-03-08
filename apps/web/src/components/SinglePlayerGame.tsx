@@ -12,11 +12,24 @@ const MAX_CELL_SIZE = 44;
 export function SinglePlayerGame() {
   const [constantSpeed, setConstantSpeed] = useState(true);
   const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer(constantSpeed);
+  const [elapsedMs, setElapsedMs] = useState(0);
   const [dropProgress, setDropProgress] = useState(0);
   const dropIntervalMsRef = useRef(dropIntervalMs);
   dropIntervalMsRef.current = dropIntervalMs;
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [cellSize, setCellSize] = useState(MAX_CELL_SIZE);
+
+  const handleReset = useCallback(() => {
+    setElapsedMs(0);
+    reset();
+  }, [reset]);
+
+  // Timer: run only when playing (not paused, not game over)
+  useEffect(() => {
+    if (state.gameOver || isPaused) return;
+    const id = setInterval(() => setElapsedMs((e) => e + 100), 100);
+    return () => clearInterval(id);
+  }, [state.gameOver, isPaused]);
 
   // Fit board in viewport: measure container and cap cell size so board doesn't overflow
   useEffect(() => {
@@ -53,7 +66,7 @@ export function SinglePlayerGame() {
   );
 
   useKeyboard(handleAction, !state.gameOver);
-  useGamepad(handleAction, !state.gameOver, { onHome: reset });
+  useGamepad(handleAction, !state.gameOver, { onHome: handleReset });
 
   return (
     <div
@@ -87,13 +100,14 @@ export function SinglePlayerGame() {
             level={constantSpeed ? 1 : state.level}
             gameOver={state.gameOver}
             isPaused={isPaused}
+            elapsedMs={elapsedMs}
           />
           <NextPiece nextPieceType={state.nextPieceType} />
           <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <button
                 type="button"
-                onClick={reset}
+                onClick={handleReset}
                 style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 6, padding: "6px 12px", cursor: "pointer" }}
               >
                 {state.gameOver ? "Play again" : "Restart"}
