@@ -1,6 +1,7 @@
 import { useSinglePlayer } from "../game/useSinglePlayer.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
 import { useGamepad } from "../game/useGamepad.ts";
+import { useScreenWakeLock } from "../game/useScreenWakeLock.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
@@ -54,6 +55,8 @@ export function SinglePlayerGame() {
 
   useKeyboard(handleAction, !state.gameOver);
   useGamepad(handleAction, !state.gameOver, { onHome: reset });
+
+  useScreenWakeLock(!state.gameOver && !isPaused);
 
   return (
     <div

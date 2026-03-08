@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useWebStomp } from "../game/useWebStomp.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
 import { useGamepad } from "../game/useGamepad.ts";
+import { useScreenWakeLock } from "../game/useScreenWakeLock.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD } from "./HUD.tsx";
 import { BackButton } from "./BackButton.tsx";
@@ -93,6 +94,7 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
   const showGame = connected && (gameStarted || room?.event === "gameStart" || gameActive);
   const showWaiting = connected && !gameStarted && !gameActive && room?.event !== "gameStart";
 
+  useScreenWakeLock(connected && !!gameActive);
   useKeyboard(handleAction, connected && gameActive);
   useGamepad(handleAction, connected && gameActive);
 
