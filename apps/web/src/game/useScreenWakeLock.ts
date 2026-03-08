@@ -60,7 +60,7 @@ export function useScreenWakeLock(active: boolean): void {
 
     // Re-acquire if we lost the lock while still active and visible (e.g. browser
     // released due to inactivity without firing release event, or controller-only play).
-    const intervalMs = 8000;
+    const intervalMs = 4000;
     const heartbeat = setInterval(() => {
       if (activeRef.current && document.visibilityState === "visible" && !sentinelRef.current) {
         requestLock();
