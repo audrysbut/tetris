@@ -61,7 +61,7 @@ export function useGamepad(
       !!buttons[15] || (axis0 > AXIS_DEAD_ZONE && axis0 >= AXIS_THRESHOLD) ||
       (axis6 > AXIS_THRESHOLD);
     const down =
-      !!buttons[13] || !!buttons[1] ||
+      !!buttons[13] ||
       (axis1 > AXIS_DEAD_ZONE && axis1 >= AXIS_THRESHOLD) ||
       (axis7 > AXIS_THRESHOLD);
     const rotate = !!buttons[0] || !!buttons[1] || !!buttons[2];
@@ -74,7 +74,7 @@ export function useGamepad(
 
     const wasLeft = !!prev.buttons[14] || prev.axisLeftRight < -AXIS_THRESHOLD;
     const wasRight = !!prev.buttons[15] || prev.axisLeftRight > AXIS_THRESHOLD;
-    const wasDown = !!prev.buttons[13] || !!prev.buttons[1] || prev.axisDown >= AXIS_THRESHOLD;
+    const wasDown = !!prev.buttons[13] || prev.axisDown >= AXIS_THRESHOLD;
     const now = Date.now();
 
     if (left) {
