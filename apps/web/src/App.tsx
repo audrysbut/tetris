@@ -1,37 +1,45 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Home } from "./components/Home.tsx";
 import { SinglePlayerGame } from "./components/SinglePlayerGame.tsx";
 import { Lobby } from "./components/Lobby.tsx";
 import { MultiplayerGame } from "./components/MultiplayerGame.tsx";
 import { BackButton } from "./components/BackButton.tsx";
 import type { JoinMatchResult } from "./api/match.ts";
+import { randomNatureImageUrl } from "./constants/picsumNatureIds.ts";
 
 type Screen = "home" | "single" | "lobby" | "multiplayer";
+
+function SinglePlayerScreen({ onBack }: { onBack: () => void }) {
+  const backgroundImage = useMemo(
+    () => `url('${randomNatureImageUrl()}')`,
+    []
+  );
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        backgroundImage,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        color: "#eee",
+      }}
+    >
+      <BackButton onClick={onBack} />
+      <SinglePlayerGame />
+    </div>
+  );
+}
 
 function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [joinResult, setJoinResult] = useState<JoinMatchResult | null>(null);
 
   if (screen === "single") {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-          // background: "#1a1a1a",
-          backgroundImage: "url('https://picsum.photos/id/440/1704/526')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          color: "#eee",
-        }}
-      >
-        <BackButton onClick={() => setScreen("home")} />
-        <SinglePlayerGame />
-      </div>
-    );
+    return <SinglePlayerScreen onBack={() => setScreen("home")} />;
   }
 
   if (screen === "multiplayer" && joinResult) {
