@@ -67,7 +67,7 @@ export function SinglePlayerGame() {
   );
 
   useKeyboard(handleAction, !state.gameOver);
-  useGamepad(handleAction, !state.gameOver, { onHome: handleReset });
+  useGamepad(handleAction, true, { onHome: handleReset });
 
   useScreenWakeLock(!state.gameOver && !isPaused);
 
