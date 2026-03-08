@@ -12,11 +12,8 @@ const MAX_CELL_SIZE = 44;
 
 export function SinglePlayerGame() {
   const [constantSpeed, setConstantSpeed] = useState(true);
-  const { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs } = useSinglePlayer(constantSpeed);
+  const { state, isPaused, setPaused, dispatch, reset } = useSinglePlayer(constantSpeed);
   const [elapsedMs, setElapsedMs] = useState(0);
-  const [dropProgress, setDropProgress] = useState(0);
-  const dropIntervalMsRef = useRef(dropIntervalMs);
-  dropIntervalMsRef.current = dropIntervalMs;
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [cellSize, setCellSize] = useState(MAX_CELL_SIZE);
 
@@ -136,7 +133,7 @@ export function SinglePlayerGame() {
           </div>
         </div>
         <div ref={boardContainerRef} style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", alignItems: "flex-start", justifyContent: "flex-start" }}>
-          <BoardCanvas state={state} dropProgress={dropProgress} cellSize={cellSize} />
+          <BoardCanvas state={state} cellSize={cellSize} />
         </div>
       </div>
     </div>

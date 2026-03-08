@@ -13,8 +13,6 @@ interface BoardCanvasProps {
   width?: number;
   height?: number;
   cellSize?: number;
-  /** 0–1 fraction of current drop interval elapsed (single-player smooth fall). */
-  dropProgress?: number;
 }
 
 export function BoardCanvas({
@@ -22,7 +20,6 @@ export function BoardCanvas({
   width = BOARD_WIDTH,
   height = BOARD_HEIGHT,
   cellSize = CELL_SIZE,
-  dropProgress,
 }: BoardCanvasProps) {
   const svgW = width * cellSize;
   const svgH = height * cellSize;
@@ -38,7 +35,7 @@ export function BoardCanvas({
   const effectiveY =
     currentPiece && ghost
       ? currentPiece.position.y +
-        (currentPiece.position.y === ghost.position.y ? 0 : (dropProgress ?? 0))
+        (currentPiece.position.y === ghost.position.y ? 0 : 0)
       : 0;
 
   return (
@@ -50,7 +47,7 @@ export function BoardCanvas({
       aria-label="Tetris board"
     >
       {/* Background */}
-      <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.85)" />
+      <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.85)" rx={8} ry={8} />
       {/* Board cells */}
       <BoardCells board={board} cellSize={cellSize} />
       {/* Ghost piece */}

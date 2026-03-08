@@ -1,6 +1,5 @@
 import { getShape, CELL_COLORS } from "@shared/mod";
-import { BoardCanvas } from "./BoardCanvas.tsx";
-import type { GameState, PieceType } from "@shared/mod";
+import type { PieceType } from "@shared/mod";
 
 export interface HUDProps {
   score: number;

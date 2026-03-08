@@ -60,9 +60,5 @@ export function useSinglePlayer(constantSpeed = false) {
     });
   }, []);
 
-  const dropIntervalMs = constantSpeed
-    ? DEFAULT_DROP_MS
-    : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
-
-  return { state, isPaused, setPaused, dispatch, reset, lastTickAt, dropIntervalMs };
+  return { state, isPaused, setPaused, dispatch, reset };
 }
