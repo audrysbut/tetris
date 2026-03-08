@@ -1,8 +1,8 @@
-import { getShape, ghostPosition, BOARD_WIDTH, BOARD_HEIGHT, CELL_COLORS } from "@shared/mod";
+import { ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 import type { GameState } from "@shared/mod";
+import { BoardCells, GhostPiece, CurrentPieceView } from "./BoardCanvasParts.tsx";
 
 const CELL_SIZE = 36;
-const BORDER = 1;
 
 interface BoardCanvasProps {
   state: GameState;
@@ -22,7 +22,6 @@ export function BoardCanvas({
 }: BoardCanvasProps) {
   const svgW = width * cellSize;
   const svgH = height * cellSize;
-  const size = cellSize - BORDER * 2;
 
   const { board, currentPiece } = state;
 
@@ -49,80 +48,19 @@ export function BoardCanvas({
       {/* Background */}
       <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.85)" />
       {/* Board cells */}
-      {board.map((row: number[], rowIndex: number) =>
-        row.map((value: number, colIndex: number) => {
-          if (value === 0) return null;
-          const x = colIndex * cellSize + BORDER;
-          const y = rowIndex * cellSize + BORDER;
-          return (
-            <rect
-              key={`board-${rowIndex}-${colIndex}`}
-              x={x}
-              y={y}
-              rx={4}
-              ry={4}
-              width={size}
-              height={size}
-              fill={CELL_COLORS[value] ?? "#333"}
-            />
-          );
-        })
-      )}
+      <BoardCells board={board} cellSize={cellSize} />
       {/* Ghost piece */}
       {currentPiece && ghostDiffers && ghost && (
-        <g>
-          {getShape(ghost.type, ghost.rotation).map((shapeRow: number[], rowIndex: number) =>
-            shapeRow.map((cell: number, colIndex: number) => {
-              if (!cell) return null;
-              const x = (ghost.position.x + colIndex) * cellSize + BORDER;
-              const y = (ghost.position.y + rowIndex) * cellSize + BORDER;
-              return (
-                <rect
-                  key={`ghost-${rowIndex}-${colIndex}`}
-                  x={x}
-                  y={y}
-                  width={size}
-                  height={size}
-                  rx={4}
-                  ry={4}
-                  fill="rgba(255,255,255,0.12)"
-                  stroke="rgba(255,255,255,0.6)"
-                  strokeWidth={2}
-                />
-              );
-            })
-          )}
-        </g>
+        <GhostPiece ghost={ghost} cellSize={cellSize} />
       )}
       {/* Current piece */}
       {currentPiece && (
-        <g>
-          {getShape(currentPiece.type, currentPiece.rotation).map(
-            (shapeRow: number[], rowIndex: number) =>
-              shapeRow.map((cell: number, colIndex: number) => {
-                if (!cell) return null;
-                const cellY = effectiveY + rowIndex;
-                if (cellY >= height) return null;
-                const x =
-                  (currentPiece.position.x + colIndex) * cellSize + BORDER;
-                const y = (effectiveY + rowIndex) * cellSize + BORDER;
-                return (
-                  <rect
-                    key={`piece-${rowIndex}-${colIndex}`}
-                    x={x}
-                    y={y}
-                    rx={4}
-                    ry={4}
-                    width={size}
-                    height={size}
-                    fill={CELL_COLORS[currentPiece.type + 1]}
-                    stroke="rgba(255,255,255,0.7)"
-                    strokeWidth={2}
-                  />
-                );
-              })
-          )}
-        </g>
+        <CurrentPieceView
+          piece={currentPiece}
+          effectiveY={effectiveY}
+          cellSize={cellSize}
+          boardHeight={height}
+        />
       )}
     </svg>
   );
