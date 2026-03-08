@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { RabbitMQService } from "../rabbitmq/rabbitmq.service.ts";
 import { GameRoomService } from "./game-room.service.ts";
+import type { GameAction } from "shared";
 
 interface ActionPayload {
   matchId: string;
@@ -12,7 +13,7 @@ interface ActionPayload {
 @Injectable()
 export class GameConsumerService {
   private activeConsumers = new Set<string>();
-  private gravityIntervals = new Map<string, ReturnType<typeof setInterval>>();
+  private gravityConsumerTags = new Map<string, string>();
 
   constructor(
     private readonly rabbit: RabbitMQService,
@@ -20,20 +21,24 @@ export class GameConsumerService {
   ) {}
 
   private stopGravity(matchId: string): void {
-    const id = this.gravityIntervals.get(matchId);
-    if (id != null) {
-      clearInterval(id);
-      this.gravityIntervals.delete(matchId);
+    const tag = this.gravityConsumerTags.get(matchId);
+    if (tag != null) {
+      this.rabbit.cancelConsumer(tag).catch((err) =>
+        console.error("[GameConsumer] cancelConsumer failed", { matchId, err })
+      );
+      this.gravityConsumerTags.delete(matchId);
     }
   }
 
-  /** Start consuming actions for a match (call when game starts) */
-  startConsuming(matchId: string): void {
+  /** Start consuming actions and gravity for a match (call when game starts) */
+  async startConsuming(matchId: string): Promise<void> {
     if (this.activeConsumers.has(matchId)) return;
     this.activeConsumers.add(matchId);
 
-    const dropMs = this.room.getDropIntervalMs();
-    const gravityId = setInterval(() => {
+    await this.rabbit.assertGravityQueue(matchId);
+
+    const tag = await this.rabbit.consumeGravity(matchId, (msg) => {
+      if (!msg) return;
       const r = this.room.getRoom(matchId);
       if (!r || r.status === "finished") {
         this.stopGravity(matchId);
@@ -42,10 +47,16 @@ export class GameConsumerService {
       const room = this.room.tickGravity(matchId);
       if (room) {
         this.rabbit.publishUpdate(matchId, this.room.serializeRoom(room));
-        if (room.status === "finished") this.stopGravity(matchId);
+        if (room.status === "finished") {
+          this.stopGravity(matchId);
+        } else {
+          this.rabbit.publishGravityDelayed(matchId, this.room.getDropIntervalMs());
+        }
       }
-    }, dropMs);
-    this.gravityIntervals.set(matchId, gravityId);
+    });
+    this.gravityConsumerTags.set(matchId, tag);
+
+    this.rabbit.publishGravityDelayed(matchId, this.room.getDropIntervalMs());
 
     this.rabbit.consumeActions(matchId, (msg) => {
       if (!msg || this.room.getRoom(matchId)?.status === "finished") return;
@@ -55,8 +66,8 @@ export class GameConsumerService {
         if (payload.matchId !== matchId || !payload.playerId || !payload.type) return;
         const playerId = payload.playerId === 1 || payload.playerId === 2 ? payload.playerId : null;
         if (!playerId) return;
-        const action = {
-          type: payload.type,
+        const action: GameAction = {
+          type: payload.type as GameAction["type"],
           dir: payload.dir as "left" | "right" | "down" | undefined,
         };
         const { room, matchEnd } = this.room.applyPlayerAction(matchId, playerId, action);

@@ -3,6 +3,7 @@ import amqp from "amqplib";
 import { Buffer } from "node:buffer";
 
 const EXCHANGE_UPDATES = "amq.topic";
+const EXCHANGE_GRAVITY_DELAYED = "gravity.delayed";
 
 /** Minimal type for amqplib connection so we can call close() without using any */
 interface AmqpConnection {
@@ -28,6 +29,11 @@ export class RabbitMQService implements OnModuleDestroy {
         if (EXCHANGE_UPDATES !== "amq.topic") {
           await this.channel.assertExchange(EXCHANGE_UPDATES, "topic", { durable: false });
         }
+        // Delayed message exchange for gravity ticks (plugin: x-delayed-message)
+        await this.channel.assertExchange(EXCHANGE_GRAVITY_DELAYED, "x-delayed-message", {
+          durable: false,
+          arguments: { "x-delayed-type": "direct" },
+        });
       } catch (err) {
         console.error("[RabbitMQ] Connection or channel failed:", err);
         throw err;
@@ -58,6 +64,46 @@ export class RabbitMQService implements OnModuleDestroy {
     if (!this.channel) throw new Error("RabbitMQ not connected");
     const name = `match.${matchId}.actions`;
     await this.channel.consume(name, handler as any, { noAck: true });
+  }
+
+  /** Assert queue for match gravity ticks (bound to delayed exchange) */
+  async assertGravityQueue(matchId: string): Promise<void> {
+    await this.ensureConnection();
+    if (!this.channel) throw new Error("RabbitMQ not connected");
+    const queueName = `match.${matchId}.gravity`;
+    const routingKey = queueName;
+    await this.channel.assertQueue(queueName, { durable: false });
+    await this.channel.bindQueue(queueName, EXCHANGE_GRAVITY_DELAYED, routingKey);
+  }
+
+  /** Publish a delayed gravity tick message (delivered after delayMs) */
+  async publishGravityDelayed(matchId: string, delayMs: number): Promise<void> {
+    await this.ensureConnection();
+    if (!this.channel) throw new Error("RabbitMQ not connected");
+    const routingKey = `match.${matchId}.gravity`;
+    const body = JSON.stringify({ matchId });
+    this.channel.publish(EXCHANGE_GRAVITY_DELAYED, routingKey, Buffer.from(body, "utf8"), {
+      headers: { "x-delay": delayMs },
+    });
+  }
+
+  /** Consume gravity tick messages; returns consumerTag for cancelConsumer */
+  async consumeGravity(
+    matchId: string,
+    handler: (msg: amqp.ConsumeMessage | null) => void
+  ): Promise<string> {
+    await this.ensureConnection();
+    if (!this.channel) throw new Error("RabbitMQ not connected");
+    const queueName = `match.${matchId}.gravity`;
+    const result = await this.channel.consume(queueName, handler, { noAck: true });
+    return result.consumerTag;
+  }
+
+  /** Cancel a consumer by tag (e.g. gravity consumer when match ends) */
+  async cancelConsumer(consumerTag: string): Promise<void> {
+    await this.ensureConnection();
+    if (!this.channel) throw new Error("RabbitMQ not connected");
+    await this.channel.cancel(consumerTag);
   }
 
   /** Publish game state update to match topic (clients subscribe via Web STOMP) */

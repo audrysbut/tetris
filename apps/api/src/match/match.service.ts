@@ -40,7 +40,7 @@ export class MatchService {
     const gameStarted = meta.playerCount === 2;
     if (gameStarted) {
       this.room.startGame(matchId);
-      this.gameConsumer.startConsuming(matchId);
+      await this.gameConsumer.startConsuming(matchId);
       const room = this.room.getRoom(matchId)!;
       this.rabbit.publishUpdate(matchId, { event: "gameStart", ...this.room.serializeRoom(room) });
     }
