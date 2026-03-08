@@ -1,5 +1,6 @@
 import { getShape, CELL_COLORS } from "@shared/mod";
 import type { Board, CurrentPiece } from "@shared/mod";
+import { Block } from "./Block.tsx";
 
 const BORDER = 1;
 
@@ -18,12 +19,10 @@ export function BoardCells({ board, cellSize }: BoardCellsProps) {
           const x = colIndex * cellSize + BORDER;
           const y = rowIndex * cellSize + BORDER;
           return (
-            <rect
+            <Block
               key={`board-${rowIndex}-${colIndex}`}
               x={x}
               y={y}
-              rx={4}
-              ry={4}
               width={size}
               height={size}
               fill={CELL_COLORS[value] ?? "#333"}
@@ -50,14 +49,12 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
           const x = (ghost.position.x + colIndex) * cellSize + BORDER;
           const y = (ghost.position.y + rowIndex) * cellSize + BORDER;
           return (
-            <rect
+            <Block
               key={`ghost-${rowIndex}-${colIndex}`}
               x={x}
               y={y}
               width={size}
               height={size}
-              rx={4}
-              ry={4}
               fill="rgba(255,255,255,0.12)"
               stroke="rgba(255,255,255,0.6)"
               strokeWidth={2}
@@ -72,7 +69,7 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
 export interface CurrentPieceViewProps {
   piece: CurrentPiece;
   effectiveY: number;
-  cellSize: number;
+  cellSize: number
   boardHeight: number;
 }
 
@@ -89,17 +86,13 @@ export function CurrentPieceView({ piece, effectiveY, cellSize, boardHeight }: C
             const x = (piece.position.x + colIndex) * cellSize + BORDER;
             const y = (effectiveY + rowIndex) * cellSize + BORDER;
             return (
-              <rect
+              <Block
                 key={`piece-${rowIndex}-${colIndex}`}
                 x={x}
                 y={y}
-                rx={4}
-                ry={4}
                 width={size}
                 height={size}
                 fill={CELL_COLORS[piece.type + 1]}
-                stroke="rgba(255,255,255,0.7)"
-                strokeWidth={2}
               />
             );
           })

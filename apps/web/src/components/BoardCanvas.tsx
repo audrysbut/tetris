@@ -1,6 +1,10 @@
 import { ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 import type { GameState } from "@shared/mod";
-import { BoardCells, GhostPiece, CurrentPieceView } from "./BoardCanvasParts.tsx";
+import {
+  BoardCells,
+  GhostPiece,
+  CurrentPieceView,
+} from "./BoardCanvasParts.tsx";
 
 const CELL_SIZE = 36;
 
@@ -34,7 +38,7 @@ export function BoardCanvas({
   const effectiveY =
     currentPiece && ghost
       ? currentPiece.position.y +
-        (currentPiece.position.y === ghost.position.y ? 0 : dropProgress ?? 0)
+        (currentPiece.position.y === ghost.position.y ? 0 : (dropProgress ?? 0))
       : 0;
 
   return (

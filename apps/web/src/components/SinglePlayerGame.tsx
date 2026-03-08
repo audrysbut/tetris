@@ -37,23 +37,6 @@ export function SinglePlayerGame() {
     return () => ro.disconnect();
   }, []);
 
-  // requestAnimationFrame: compute drop progress for smooth falling
-  // Only re-run when lastTickAt changes (real tick), not when dropIntervalMs changes (level up),
-  // to avoid jitter from resetting progress without the piece moving.
-  // useEffect(() => {
-  //   if (state.gameOver || isPaused || !state.currentPiece) return;
-  //   setDropProgress(0);
-  //   let rafId: number;
-  //   const tick = () => {
-  //     const elapsed = Date.now() - lastTickAt;
-  //     const progress = Math.min(elapsed / dropIntervalMsRef.current, 0.9999);
-  //     setDropProgress(progress);
-  //     rafId = requestAnimationFrame(tick);
-  //   };
-  //   rafId = requestAnimationFrame(tick);
-  //   return () => cancelAnimationFrame(rafId);
-  // }, [state.gameOver, isPaused, lastTickAt]);
-
   const handleAction = useCallback(
     (action: KeyAction) => {
       if (action === "pause") {
