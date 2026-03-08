@@ -80,8 +80,28 @@ export function SinglePlayerGame() {
         alignItems: "flex-start",
       }}
     >
-      <h2 style={{ marginTop: 0, marginBottom: 4, fontSize: 18, flexShrink: 0, color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000" }}>Practice Tetris</h2>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0, flex: 1, minHeight: 0 }}>
+      <h2
+        style={{
+          marginTop: 0,
+          marginBottom: 4,
+          fontSize: 18,
+          flexShrink: 0,
+          color: "#fff",
+          textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000",
+        }}
+      >
+        Single player
+      </h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 12,
+          minWidth: 0,
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -103,12 +123,33 @@ export function SinglePlayerGame() {
             elapsedMs={elapsedMs}
           />
           <NextPiece nextPieceType={state.nextPieceType} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
-            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              alignItems: "flex-start",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
               <button
                 type="button"
                 onClick={handleReset}
-                style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 6, padding: "6px 12px", cursor: "pointer" }}
+                style={{
+                  background: "rgba(255,255,255,0.2)",
+                  color: "#fff",
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  borderRadius: 6,
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                }}
               >
                 {state.gameOver ? "Play again" : "Restart"}
               </button>
@@ -116,23 +157,51 @@ export function SinglePlayerGame() {
                 <button
                   type="button"
                   onClick={() => setPaused((p) => !p)}
-                  style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 6, padding: "6px 12px", cursor: "pointer" }}
+                  style={{
+                    background: "rgba(255,255,255,0.2)",
+                    color: "#fff",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    borderRadius: 6,
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                  }}
                 >
                   {isPaused ? "Resume" : "Pause"}
                 </button>
               )}
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 13,
+                color: "#fff",
+                textShadow: "0 1px 2px rgba(0,0,0,0.8)",
+              }}
+            >
               <input
                 type="checkbox"
                 checked={constantSpeed}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConstantSpeed(e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setConstantSpeed(e.target.checked)
+                }
               />
               Constant speed
             </label>
           </div>
         </div>
-        <div ref={boardContainerRef} style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", alignItems: "flex-start", justifyContent: "flex-start" }}>
+        <div
+          ref={boardContainerRef}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            minHeight: 0,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+          }}
+        >
           <BoardCanvas state={state} cellSize={cellSize} />
         </div>
       </div>

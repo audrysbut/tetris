@@ -47,7 +47,7 @@ export function BoardCanvas({
       aria-label="Tetris board"
     >
       {/* Background */}
-      <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.85)" rx={8} ry={8} />
+      <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.5)" rx={8} ry={8} />
       {/* Board cells */}
       <BoardCells board={board} cellSize={cellSize} />
       {/* Ghost piece */}
