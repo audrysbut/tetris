@@ -41,43 +41,49 @@ interface NextPieceProps {
   nextPieceType: PieceType;
 }
 
-const NEXT_SIZE = 16;
+const NEXT_CELL = 16;
+const NEXT_INSET = 2; // proportional to Block's inner rect
 
 export function NextPiece({ nextPieceType }: NextPieceProps) {
   const shape = getShape(nextPieceType, 0);
   const rows = shape.length;
   const cols = shape[0].length;
   const color = CELL_COLORS[nextPieceType + 1];
+  const size = NEXT_CELL - 2; // match board block size = cellSize - BORDER*2
+  const svgW = cols * NEXT_CELL;
+  const svgH = rows * NEXT_CELL;
+
   return (
     <div style={{ marginTop: 8 }}>
       <div style={{ fontSize: 11, marginBottom: 2, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}>Next</div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${cols}, ${NEXT_SIZE}px)`,
-          gridTemplateRows: `repeat(${rows}, ${NEXT_SIZE}px)`,
-          width: cols * NEXT_SIZE,
-          height: rows * NEXT_SIZE,
-          background: "#111",
-        }}
-      >
+      <svg width={svgW} height={svgH} style={{ display: "block" }} aria-hidden>
         {shape.flatMap((row: number[], r: number) =>
           row.map((cell: number, c: number) =>
             cell ? (
-              <div
-                key={`${r}-${c}`}
-                style={{
-                  background: color,
-                  width: NEXT_SIZE - 2,
-                  height: NEXT_SIZE - 2,
-                }}
-              />
-            ) : (
-              <div key={`${r}-${c}`} />
-            )
+              <g key={`${r}-${c}`}>
+                <rect
+                  x={c * NEXT_CELL + 1}
+                  y={r * NEXT_CELL + 1}
+                  width={size}
+                  height={size}
+                  fill={color}
+                  rx={2}
+                  ry={2}
+                />
+                <rect
+                  x={c * NEXT_CELL + 1 + NEXT_INSET}
+                  y={r * NEXT_CELL + 1 + NEXT_INSET}
+                  width={size - NEXT_INSET * 2}
+                  height={size - NEXT_INSET * 2}
+                  fill="rgba(255,255,255,0.5)"
+                  rx={2}
+                  ry={2}
+                />
+              </g>
+            ) : null
           )
         )}
-      </div>
+      </svg>
     </div>
   );
 }
