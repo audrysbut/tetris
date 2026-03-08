@@ -184,14 +184,14 @@ export function randomPieceType(): PieceType {
 }
 
 /** Cell colors for rendering: index 0 = empty, 1–7 = I, O, T, S, Z, J, L */
-const OPACITY = 1;
+const OPACITY = 0.8;
 export const CELL_COLORS: string[] = [
   "#000",
-  `rgba(0, 240, 240, ${OPACITY})`, // I
-  `rgba(240, 240, 0, ${OPACITY})`, // O
-  `rgba(160, 0, 240, ${OPACITY})`, // T
-  `rgba(0, 240, 0, ${OPACITY})`, // S
-  `rgba(240, 0, 0, ${OPACITY})`, // Z
-  `rgba(0, 0, 240, ${OPACITY})`, // J
-  `rgba(240, 160, 0, ${OPACITY})`, // L
+  `rgba(34, 211, 211, ${OPACITY})`, // I – cyan
+  `rgba(250, 204, 21, ${OPACITY})`, // O – amber
+  `rgba(192, 132, 252, ${OPACITY})`, // T – violet
+  `rgba(74, 222, 128, ${OPACITY})`, // S – emerald
+  `rgba(248, 113, 113, ${OPACITY})`, // Z – coral
+  `rgba(96, 165, 250, ${OPACITY})`, // J – sky blue
+  `rgba(251, 146, 60, ${OPACITY})`, // L – orange
 ];
