@@ -11,13 +11,22 @@ interface HUDProps {
 }
 
 export function HUD({ score, lines, level, gameOver, isPaused }: HUDProps) {
+  const textShadow = "0 1px 2px rgba(0,0,0,0.9), 0 0 4px #000";
   return (
-    <div style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 13 }}>
+    <div
+      style={{
+        marginBottom: 4,
+        fontFamily: "monospace",
+        fontSize: 13,
+        textShadow,
+        color: "#fff",
+      }}
+    >
       <div>Score: {score}</div>
       <div>Lines: {lines}</div>
       <div>Level: {level}</div>
-      {gameOver && <div style={{ color: "#f00", fontWeight: "bold" }}>Game Over</div>}
-      {isPaused && !gameOver && <div style={{ color: "#ff0" }}>Paused</div>}
+      {gameOver && <div style={{ color: "#f66", fontWeight: "bold" }}>Game Over</div>}
+      {isPaused && !gameOver && <div style={{ color: "#ffc" }}>Paused</div>}
     </div>
   );
 }
@@ -35,7 +44,7 @@ export function NextPiece({ nextPieceType }: NextPieceProps) {
   const color = CELL_COLORS[nextPieceType + 1];
   return (
     <div style={{ marginTop: 8 }}>
-      <div style={{ fontSize: 11, marginBottom: 2 }}>Next</div>
+      <div style={{ fontSize: 11, marginBottom: 2, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.9)" }}>Next</div>
       <div
         style={{
           display: "grid",

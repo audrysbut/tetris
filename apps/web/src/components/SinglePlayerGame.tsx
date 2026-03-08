@@ -1,7 +1,6 @@
 import { useSinglePlayer } from "../game/useSinglePlayer.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
 import { useGamepad } from "../game/useGamepad.ts";
-import { useScreenWakeLock } from "../game/useScreenWakeLock.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
@@ -56,8 +55,6 @@ export function SinglePlayerGame() {
   useKeyboard(handleAction, !state.gameOver);
   useGamepad(handleAction, !state.gameOver, { onHome: reset });
 
-  useScreenWakeLock(!state.gameOver && !isPaused);
-
   return (
     <div
       style={{
@@ -70,7 +67,7 @@ export function SinglePlayerGame() {
         alignItems: "flex-start",
       }}
     >
-      <h2 style={{ marginTop: 0, marginBottom: 4, fontSize: 18, flexShrink: 0 }}>Practice Tetris</h2>
+      <h2 style={{ marginTop: 0, marginBottom: 4, fontSize: 18, flexShrink: 0, color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000" }}>Practice Tetris</h2>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0, flex: 1, minHeight: 0 }}>
         <div
           style={{
@@ -79,6 +76,9 @@ export function SinglePlayerGame() {
             gap: 8,
             minWidth: 140,
             flexShrink: 0,
+            background: "rgba(0,0,0,0.45)",
+            padding: "10px 12px",
+            borderRadius: 8,
           }}
         >
           <HUD
@@ -91,16 +91,24 @@ export function SinglePlayerGame() {
           <NextPiece nextPieceType={state.nextPieceType} />
           <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              <button type="button" onClick={reset}>
+              <button
+                type="button"
+                onClick={reset}
+                style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 6, padding: "6px 12px", cursor: "pointer" }}
+              >
                 {state.gameOver ? "Play again" : "Restart"}
               </button>
               {!state.gameOver && (
-                <button type="button" onClick={() => setPaused((p) => !p)}>
+                <button
+                  type="button"
+                  onClick={() => setPaused((p) => !p)}
+                  style={{ background: "rgba(255,255,255,0.2)", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 6, padding: "6px 12px", cursor: "pointer" }}
+                >
                   {isPaused ? "Resume" : "Pause"}
                 </button>
               )}
             </div>
-            <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>
               <input
                 type="checkbox"
                 checked={constantSpeed}
