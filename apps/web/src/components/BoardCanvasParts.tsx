@@ -15,7 +15,7 @@ export interface BoardCellsProps {
   clearingRows?: number[];
 }
 
-const CLEAR_ANIMATION_DURATION = 0.32;
+const CLEAR_ANIMATION_DURATION = 0.1;
 
 export function BoardCells({ board, cellSize, clearingRows = [] }: BoardCellsProps) {
   const size = cellSize - BORDER * 2;
@@ -33,8 +33,8 @@ export function BoardCells({ board, cellSize, clearingRows = [] }: BoardCellsPro
             return (
               <motion.g
                 key={`board-${rowIndex}-${colIndex}`}
-                initial={{ scale: 1, opacity: 1 }}
-                animate={{ scale: 0, opacity: 0 }}
+                initial={{ scaleY: 1, opacity: 1 }}
+                animate={{ scaleY: 0, opacity: 0 }}
                 transition={{ duration: CLEAR_ANIMATION_DURATION, ease: "easeIn" }}
                 style={{
                   transformOrigin: `${x + size / 2}px ${y + size / 2}px`,
