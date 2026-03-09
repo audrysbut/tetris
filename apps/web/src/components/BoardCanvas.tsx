@@ -24,7 +24,7 @@ export function BoardCanvas({
   const svgW = width * cellSize;
   const svgH = height * cellSize;
 
-  const { board, currentPiece } = state;
+  const { board, currentPiece, clearingRows } = state;
 
   const ghost = currentPiece ? ghostPosition(board, currentPiece) : null;
   const ghostDiffers =
@@ -49,7 +49,11 @@ export function BoardCanvas({
       {/* Background */}
       <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.5)" rx={8} ry={8} />
       {/* Board cells */}
-      <BoardCells board={board} cellSize={cellSize} />
+      <BoardCells
+        board={board}
+        cellSize={cellSize}
+        clearingRows={clearingRows}
+      />
       {/* Ghost piece */}
       {currentPiece && ghostDiffers && ghost && (
         <GhostPiece ghost={ghost} cellSize={cellSize} />

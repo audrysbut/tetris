@@ -3,11 +3,14 @@ import {
   createInitialState,
   tick,
   lockPiece,
+  finishLineClear,
   applyAction,
   DEFAULT_DROP_MS,
   type GameState,
   type GameAction,
 } from "@shared/mod";
+
+const LINE_CLEAR_ANIMATION_MS = 400;
 
 export function useSinglePlayer(constantSpeed = false) {
   const [state, setState] = useState<GameState>(() => createInitialState());
@@ -21,9 +24,19 @@ export function useSinglePlayer(constantSpeed = false) {
     setLastTickAt(Date.now());
   }, []);
 
-  // Game loop: drop every N ms
+  // When in line-clear phase, wait for animation then finish clear and spawn next piece
   useEffect(() => {
-    if (state.gameOver || isPaused) {
+    const clearing = state.clearingRows?.length;
+    if (!clearing) return;
+    const id = window.setTimeout(() => {
+      setState((s) => finishLineClear(s));
+    }, LINE_CLEAR_ANIMATION_MS);
+    return () => clearTimeout(id);
+  }, [state.clearingRows]);
+
+  // Game loop: drop every N ms (paused while clearing or game over)
+  useEffect(() => {
+    if (state.gameOver || isPaused || state.clearingRows?.length) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -44,11 +57,12 @@ export function useSinglePlayer(constantSpeed = false) {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [state.gameOver, state.level, isPaused, constantSpeed]);
+  }, [state.gameOver, state.level, state.clearingRows, isPaused, constantSpeed]);
 
   const dispatch = useCallback((action: GameAction) => {
     setState((s) => {
       if (s.gameOver) return s;
+      if (s.clearingRows?.length) return s; // no-op during line-clear animation
       const next = applyAction(s, action);
       if (next) return next;
       // Maybe lock after move down

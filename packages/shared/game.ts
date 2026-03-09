@@ -80,10 +80,7 @@ export function mergePiece(board: Board, piece: CurrentPiece): Board {
 
 /** Find and clear full rows; return [newBoard, numberOfLinesCleared] */
 export function clearLines(board: Board): [Board, number] {
-  const fullRows: number[] = [];
-  for (let y = 0; y < board.length; y++) {
-    if (board[y].every((cell) => cell !== 0)) fullRows.push(y);
-  }
+  const fullRows = getFullRows(board);
   if (fullRows.length === 0) return [cloneBoard(board), 0];
   const newBoard = board.filter((_, y) => !fullRows.includes(y));
   const emptyRows = fullRows.length;
@@ -91,6 +88,15 @@ export function clearLines(board: Board): [Board, number] {
     newBoard.unshift(Array.from({ length: BOARD_WIDTH }, () => 0));
   }
   return [newBoard as Board, emptyRows];
+}
+
+/** Return row indices that are full (all cells non-zero) */
+export function getFullRows(board: Board): number[] {
+  const fullRows: number[] = [];
+  for (let y = 0; y < board.length; y++) {
+    if (board[y].every((cell) => cell !== 0)) fullRows.push(y);
+  }
+  return fullRows;
 }
 
 /** Score for clearing n lines (1-4) */
@@ -205,7 +211,7 @@ export function rotate(state: GameState): GameState | null {
   return null;
 }
 
-/** Hard drop: move piece to bottom, lock, clear lines, spawn next */
+/** Hard drop: move piece to bottom, then lock (may start line-clear animation). */
 export function hardDrop(state: GameState): GameState {
   if (state.gameOver || !state.currentPiece) return state;
   let s = { ...state };
@@ -216,45 +222,57 @@ export function hardDrop(state: GameState): GameState {
       position: { ...piece.position, y: piece.position.y + 1 },
     };
   }
-  let board = mergePiece(s.board, piece);
-  const [newBoard, linesCleared] = clearLines(board);
-  const addScore = scoreForLines(linesCleared);
-  const nextType = s.nextPieceType;
-  const spawnPos = spawnPosition(nextType);
-  const wouldCollide = wouldSpawnCollide(newBoard, nextType);
-  return {
-    ...s,
-    board: newBoard,
-    score: s.score + addScore,
-    lines: s.lines + linesCleared,
-    level: Math.floor((s.lines + linesCleared) / 10) + 1,
-    gameOver: wouldCollide,
-    currentPiece: wouldCollide
-      ? null
-      : {
-          type: nextType,
-          rotation: 0,
-          position: spawnPos,
-        },
-    nextPieceType: wouldCollide ? s.nextPieceType : randomPieceType(),
-  };
+  return lockPiece({ ...s, currentPiece: piece });
 }
 
-/** Lock current piece (merge, clear lines, spawn next). Call after tick returns null or on soft drop lock. */
+/** Start line-clear phase: merge piece, set clearingRows if any full rows; otherwise do full lock. */
 export function lockPiece(state: GameState): GameState {
   if (state.gameOver || !state.currentPiece) return state;
   const board = mergePiece(state.board, state.currentPiece);
-  const [newBoard, linesCleared] = clearLines(board);
+  const fullRows = getFullRows(board);
+  if (fullRows.length === 0) {
+    const [newBoard] = clearLines(board);
+    const nextType = state.nextPieceType;
+    const spawnPos = spawnPosition(nextType);
+    const wouldCollide = wouldSpawnCollide(newBoard, nextType);
+    return {
+      ...state,
+      board: newBoard,
+      currentPiece: wouldCollide
+        ? null
+        : {
+            type: nextType,
+            rotation: 0,
+            position: spawnPos,
+          },
+      nextPieceType: wouldCollide ? state.nextPieceType : randomPieceType(),
+      gameOver: wouldCollide,
+    };
+  }
+  return {
+    ...state,
+    board,
+    currentPiece: null,
+    clearingRows: fullRows,
+  };
+}
+
+/** Finish line-clear: apply clear, update score/lines/level, spawn next. Call after clearing animation. */
+export function finishLineClear(state: GameState): GameState {
+  const clearingRows = state.clearingRows;
+  if (!clearingRows?.length) return state;
+  const [newBoard, linesCleared] = clearLines(state.board);
   const addScore = scoreForLines(linesCleared);
   const nextType = state.nextPieceType;
   const spawnPos = spawnPosition(nextType);
   const wouldCollide = wouldSpawnCollide(newBoard, nextType);
-  return {
+  const newState: GameState = {
     ...state,
     board: newBoard,
     score: state.score + addScore,
     lines: state.lines + linesCleared,
     level: Math.floor((state.lines + linesCleared) / 10) + 1,
+    clearingRows: undefined,
     currentPiece: wouldCollide
       ? null
       : {
@@ -265,6 +283,7 @@ export function lockPiece(state: GameState): GameState {
     nextPieceType: wouldCollide ? state.nextPieceType : randomPieceType(),
     gameOver: wouldCollide,
   };
+  return newState;
 }
 
 /** Apply one action (move/rotate/softDrop/hardDrop); returns new state or null if no change */

@@ -9,10 +9,16 @@ const MOVE_DURATION = 0.06;
 export interface BoardCellsProps {
   board: Board;
   cellSize: number;
+  /** Row indices currently animating (line clear). */
+  clearingRows?: number[];
 }
 
-export function BoardCells({ board, cellSize }: BoardCellsProps) {
+const CLEAR_ANIMATION_DURATION = 0.32;
+
+export function BoardCells({ board, cellSize, clearingRows = [] }: BoardCellsProps) {
   const size = cellSize - BORDER * 2;
+  const isClearing = (rowIndex: number) => clearingRows.includes(rowIndex);
+
   return (
     <>
       {board.map((row: number[], rowIndex: number) =>
@@ -20,6 +26,28 @@ export function BoardCells({ board, cellSize }: BoardCellsProps) {
           if (value === 0) return null;
           const x = colIndex * cellSize + BORDER;
           const y = rowIndex * cellSize + BORDER;
+          const clearing = isClearing(rowIndex);
+          if (clearing) {
+            return (
+              <motion.g
+                key={`board-${rowIndex}-${colIndex}`}
+                initial={{ scale: 1, opacity: 1 }}
+                animate={{ scale: 0, opacity: 0 }}
+                transition={{ duration: CLEAR_ANIMATION_DURATION, ease: "easeIn" }}
+                style={{
+                  transformOrigin: `${x + size / 2}px ${y + size / 2}px`,
+                }}
+              >
+                <Block
+                  x={x}
+                  y={y}
+                  width={size}
+                  height={size}
+                  fill="rgba(255,255,255,0.9)"
+                />
+              </motion.g>
+            );
+          }
           return (
             <Block
               key={`board-${rowIndex}-${colIndex}`}
