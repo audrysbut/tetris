@@ -46,7 +46,7 @@ export function useSinglePlayer(constantSpeed = false) {
     const ms = constantSpeed
       ? DEFAULT_DROP_MS
       : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
-    intervalRef.current = window.setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setLastTickAt(Date.now());
       setState((s) => {
         const next = tick(s);

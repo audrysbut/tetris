@@ -15,9 +15,13 @@ export interface BoardCellsProps {
   clearingRows?: number[];
 }
 
-const CLEAR_ANIMATION_DURATION = 0.1;
+const CLEAR_ANIMATION_DURATION = 0.2;
 
-export function BoardCells({ board, cellSize, clearingRows = [] }: BoardCellsProps) {
+export function BoardCells({
+  board,
+  cellSize,
+  clearingRows = [],
+}: BoardCellsProps) {
   const size = cellSize - BORDER * 2;
   const isClearing = (rowIndex: number) => clearingRows.includes(rowIndex);
 
@@ -35,7 +39,10 @@ export function BoardCells({ board, cellSize, clearingRows = [] }: BoardCellsPro
                 key={`board-${rowIndex}-${colIndex}`}
                 initial={{ scaleY: 1, opacity: 1 }}
                 animate={{ scaleY: 0, opacity: 0 }}
-                transition={{ duration: CLEAR_ANIMATION_DURATION, ease: "easeIn" }}
+                transition={{
+                  duration: CLEAR_ANIMATION_DURATION,
+                  ease: "easeIn",
+                }}
                 style={{
                   transformOrigin: `${x + size / 2}px ${y + size / 2}px`,
                 }}
@@ -60,7 +67,7 @@ export function BoardCells({ board, cellSize, clearingRows = [] }: BoardCellsPro
               fill={CELL_COLORS[value] ?? "#333"}
             />
           );
-        })
+        }),
       )}
     </>
   );
@@ -81,24 +88,25 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
       animate={{ x: groupX, y: groupY }}
       transition={{ duration: MOVE_DURATION }}
     >
-      {getShape(ghost.type, ghost.rotation).map((shapeRow: number[], rowIndex: number) =>
-        shapeRow.map((cell: number, colIndex: number) => {
-          if (!cell) return null;
-          const x = colIndex * cellSize + BORDER;
-          const y = rowIndex * cellSize + BORDER;
-          return (
-            <Block
-              key={`ghost-${rowIndex}-${colIndex}`}
-              x={x}
-              y={y}
-              width={size}
-              height={size}
-              fill="rgba(255,255,255,0.12)"
-              stroke="rgba(255,255,255,0.6)"
-              strokeWidth={2}
-            />
-          );
-        })
+      {getShape(ghost.type, ghost.rotation).map(
+        (shapeRow: number[], rowIndex: number) =>
+          shapeRow.map((cell: number, colIndex: number) => {
+            if (!cell) return null;
+            const x = colIndex * cellSize + BORDER;
+            const y = rowIndex * cellSize + BORDER;
+            return (
+              <Block
+                key={`ghost-${rowIndex}-${colIndex}`}
+                x={x}
+                y={y}
+                width={size}
+                height={size}
+                fill="rgba(255,255,255,0.12)"
+                stroke="rgba(255,255,255,0.6)"
+                strokeWidth={2}
+              />
+            );
+          }),
       )}
     </motion.g>
   );
@@ -107,20 +115,26 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
 export interface CurrentPieceViewProps {
   piece: CurrentPiece;
   effectiveY: number;
-  cellSize: number
+  cellSize: number;
   boardHeight: number;
 }
 
-export function CurrentPieceView({ piece, effectiveY, cellSize, boardHeight }: CurrentPieceViewProps) {
+export function CurrentPieceView({
+  piece,
+  effectiveY,
+  cellSize,
+  boardHeight,
+}: CurrentPieceViewProps) {
   const size = cellSize - BORDER * 2;
   const shape = getShape(piece.type, piece.rotation);
   const groupX = piece.position.x * cellSize;
   const groupY = effectiveY * cellSize;
 
   const prevRotationRef = useRef(piece.rotation);
-  const rotationDelta = prevRotationRef.current !== piece.rotation
-    ? (prevRotationRef.current - piece.rotation) * 90
-    : 0;
+  const rotationDelta =
+    prevRotationRef.current !== piece.rotation
+      ? -Math.abs((prevRotationRef.current - piece.rotation) * 90)
+      : 0;
   useEffect(() => {
     prevRotationRef.current = piece.rotation;
   }, [piece.rotation]);
@@ -148,25 +162,24 @@ export function CurrentPieceView({ piece, effectiveY, cellSize, boardHeight }: C
           transformOrigin: `${originX}px ${originY}px`,
         }}
       >
-        {shape.map(
-          (shapeRow: number[], rowIndex: number) =>
-            shapeRow.map((cell: number, colIndex: number) => {
-              if (!cell) return null;
-              const cellY = effectiveY + rowIndex;
-              if (cellY >= boardHeight) return null;
-              const x = colIndex * cellSize + BORDER;
-              const y = rowIndex * cellSize + BORDER;
-              return (
-                <Block
-                  key={`piece-${rowIndex}-${colIndex}`}
-                  x={x}
-                  y={y}
-                  width={size}
-                  height={size}
-                  fill={CELL_COLORS[piece.type + 1]}
-                />
-              );
-            })
+        {shape.map((shapeRow: number[], rowIndex: number) =>
+          shapeRow.map((cell: number, colIndex: number) => {
+            if (!cell) return null;
+            const cellY = effectiveY + rowIndex;
+            if (cellY >= boardHeight) return null;
+            const x = colIndex * cellSize + BORDER;
+            const y = rowIndex * cellSize + BORDER;
+            return (
+              <Block
+                key={`piece-${rowIndex}-${colIndex}`}
+                x={x}
+                y={y}
+                width={size}
+                height={size}
+                fill={CELL_COLORS[piece.type + 1]}
+              />
+            );
+          }),
         )}
       </motion.g>
     </motion.g>
