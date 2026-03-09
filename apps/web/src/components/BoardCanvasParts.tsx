@@ -1,10 +1,12 @@
 import { getShape, CELL_COLORS } from "@shared/mod";
 import type { Board, CurrentPiece } from "@shared/mod";
+import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Block } from "./Block.tsx";
 
 const BORDER = 1;
-const MOVE_DURATION = 0.06;
+const MOVE_DURATION = 0.04;
+const ROTATE_DURATION = 0.08;
 
 export interface BoardCellsProps {
   board: Board;
@@ -115,32 +117,58 @@ export function CurrentPieceView({ piece, effectiveY, cellSize, boardHeight }: C
   const groupX = piece.position.x * cellSize;
   const groupY = effectiveY * cellSize;
 
+  const prevRotationRef = useRef(piece.rotation);
+  const rotationDelta = prevRotationRef.current !== piece.rotation
+    ? (prevRotationRef.current - piece.rotation) * 90
+    : 0;
+  useEffect(() => {
+    prevRotationRef.current = piece.rotation;
+  }, [piece.rotation]);
+
+  const cols = shape[0].length;
+  const rows = shape.length;
+  const originX = (cols * cellSize) / 2;
+  const originY = (rows * cellSize) / 2;
+
   return (
     <motion.g
       initial={false}
-      animate={{ x: groupX, y: groupY }}
+      animate={{
+        x: groupX,
+        y: groupY,
+      }}
       transition={{ duration: MOVE_DURATION }}
     >
-      {shape.map(
-        (shapeRow: number[], rowIndex: number) =>
-          shapeRow.map((cell: number, colIndex: number) => {
-            if (!cell) return null;
-            const cellY = effectiveY + rowIndex;
-            if (cellY >= boardHeight) return null;
-            const x = colIndex * cellSize + BORDER;
-            const y = rowIndex * cellSize + BORDER;
-            return (
-              <Block
-                key={`piece-${rowIndex}-${colIndex}`}
-                x={x}
-                y={y}
-                width={size}
-                height={size}
-                fill={CELL_COLORS[piece.type + 1]}
-              />
-            );
-          })
-      )}
+      <motion.g
+        key={piece.rotation}
+        initial={{ rotate: rotationDelta }}
+        animate={{ rotate: 0 }}
+        transition={{ duration: ROTATE_DURATION, ease: "easeOut" }}
+        style={{
+          transformOrigin: `${originX}px ${originY}px`,
+        }}
+      >
+        {shape.map(
+          (shapeRow: number[], rowIndex: number) =>
+            shapeRow.map((cell: number, colIndex: number) => {
+              if (!cell) return null;
+              const cellY = effectiveY + rowIndex;
+              if (cellY >= boardHeight) return null;
+              const x = colIndex * cellSize + BORDER;
+              const y = rowIndex * cellSize + BORDER;
+              return (
+                <Block
+                  key={`piece-${rowIndex}-${colIndex}`}
+                  x={x}
+                  y={y}
+                  width={size}
+                  height={size}
+                  fill={CELL_COLORS[piece.type + 1]}
+                />
+              );
+            })
+        )}
+      </motion.g>
     </motion.g>
   );
 }
