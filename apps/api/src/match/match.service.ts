@@ -4,6 +4,7 @@ import { GameRoomService } from "../game/game-room.service.ts";
 import { GameConsumerService } from "../game/game-consumer.service.ts";
 import type { CreateMatchResult, JoinMatchResult } from "shared";
 
+const ACTIONS_DESTINATION = "/amq/queue/match.actions";
 interface MatchMeta {
   matchId: string;
   playerCount: number;
@@ -21,12 +22,11 @@ export class MatchService {
 
   async createMatch(): Promise<CreateMatchResult> {
     const matchId = crypto.randomUUID().slice(0, 8);
-    await this.rabbit.assertActionsQueue(matchId);
     this.room.createRoom(matchId);
     this.matches.set(matchId, { matchId, playerCount: 0 });
     return {
       matchId,
-      actionsDestination: `/amq/queue/match.${matchId}.actions`,
+      actionsDestination: ACTIONS_DESTINATION,
       updatesDestination: `/topic/match.${matchId}.updates`,
     };
   }
@@ -47,7 +47,7 @@ export class MatchService {
     return {
       matchId,
       playerId,
-      actionsDestination: `/amq/queue/match.${matchId}.actions`,
+      actionsDestination: ACTIONS_DESTINATION,
       updatesDestination: `/topic/match.${matchId}.updates`,
       gameStarted,
     };

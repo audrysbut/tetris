@@ -13,7 +13,7 @@ export class MatchController {
 
   @Post("join")
   async join(@Body("matchId") matchId: string): Promise<JoinMatchResult | MatchErrorResponse> {
-    if (!matchId) return { error: "matchId required" };
+    if (!matchId) return { error: "matchId requcired" };
     const result = await this.matchService.joinMatch(matchId);
     if (!result) return { error: "Match not found or full" };
     return result;
