@@ -26,6 +26,8 @@ export function Block({ x, y, width, height, fill }: BlockProps) {
         width={width - 10}
         height={height - 10}
         fill="rgba(255,255,255,0.5)"
+        stroke="rgba(0,0,0,1)"
+        strokeWidth={2}
       />
     </g>
   );

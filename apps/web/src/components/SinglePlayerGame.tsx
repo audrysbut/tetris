@@ -54,13 +54,14 @@ export function SinglePlayerGame() {
         setPaused((p) => !p);
         return;
       }
+      if (isPaused) return;
       if (action === "left") dispatch({ type: "move", dir: "left" });
       else if (action === "right") dispatch({ type: "move", dir: "right" });
       else if (action === "rotate") dispatch({ type: "rotate" });
       else if (action === "softDrop") dispatch({ type: "move", dir: "down" });
       else if (action === "hardDrop") dispatch({ type: "hardDrop" });
     },
-    [dispatch, setPaused]
+    [dispatch, setPaused, isPaused]
   );
 
   useKeyboard(handleAction, !state.gameOver);
