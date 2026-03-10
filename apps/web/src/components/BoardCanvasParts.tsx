@@ -101,7 +101,7 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
                 y={y}
                 width={size}
                 height={size}
-                fill="rgba(255,255,255,0.12)"
+                fill="rgba(255,255,255,0.05)"
                 stroke="rgba(255,255,255,0.6)"
                 strokeWidth={2}
               />
