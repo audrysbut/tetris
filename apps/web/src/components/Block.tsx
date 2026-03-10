@@ -4,24 +4,9 @@ export interface BlockProps {
   width: number;
   height: number;
   fill: string;
-  stroke?: string;
-  strokeWidth?: number;
 }
 
-export function Block({
-  x,
-  y,
-  width,
-  height,
-  fill,
-  stroke,
-  strokeWidth,
-}: BlockProps) {
-  const innerProps = {
-    ...(stroke !== undefined && strokeWidth !== undefined
-      ? { stroke, strokeWidth }
-      : {}),
-  };
+export function Block({ x, y, width, height, fill }: BlockProps) {
   return (
     <g>
       <rect
@@ -32,7 +17,6 @@ export function Block({
         fill={fill}
         rx={4}
         ry={4}
-        {...innerProps}
       />
       <rect
         x={x + 5}
@@ -51,7 +35,6 @@ export function Block({
         fill={fill}
         rx={4}
         ry={4}
-        {...innerProps}
       />
       <rect
         x={x + 15}

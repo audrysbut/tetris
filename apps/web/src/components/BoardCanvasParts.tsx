@@ -95,7 +95,7 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
             const x = colIndex * cellSize + BORDER;
             const y = rowIndex * cellSize + BORDER;
             return (
-              <Block
+              <rect
                 key={`ghost-${rowIndex}-${colIndex}`}
                 x={x}
                 y={y}
@@ -104,6 +104,8 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
                 fill="rgba(255,255,255,0.05)"
                 stroke="rgba(255,255,255,0.6)"
                 strokeWidth={2}
+                rx={4}
+                ry={4}
               />
             );
           }),
