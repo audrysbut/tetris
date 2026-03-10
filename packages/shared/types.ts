@@ -45,6 +45,10 @@ export interface PlayerGameState {
   lines: number;
   gameOver: boolean;
   level: number;
+  /** Seed for deterministic piece sequence */
+  pieceSeed: number;
+  /** Number of pieces consumed (current + next count as first two) */
+  pieceIndex: number;
 }
 
 /** Full game state for one player (used by client and server) */
