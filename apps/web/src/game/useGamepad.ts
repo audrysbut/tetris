@@ -3,7 +3,7 @@ import { getFirstGamepad } from "./gamepad.ts";
 import type { KeyAction } from "./useKeyboard.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
-const AXIS_THRESHOLD = 1;
+const AXIS_THRESHOLD = 0.9;
 const REPEAT_MS = 100;
 const SOFT_DROP_REPEAT_MS = 130;
 /** Ignore same-direction input for this long after release to avoid overshoot (stick/d-pad bounce or lag) */
