@@ -4,6 +4,7 @@ import {
   applyAction,
   tick,
   lockPiece,
+  finishLineClear,
   DEFAULT_DROP_MS,
   type GameState,
   type GameAction,
@@ -55,7 +56,8 @@ export class GameRoomService {
         if (id === 1) room.player1 = ticked;
         else room.player2 = ticked;
       } else {
-        const locked = lockPiece(s);
+        let locked = lockPiece(s);
+        if (locked.clearingRows?.length) locked = finishLineClear(locked);
         if (id === 1) room.player1 = locked;
         else room.player2 = locked;
       }
@@ -89,10 +91,12 @@ export class GameRoomService {
 
     let next = applyAction(state, action);
     if (next) {
+      if (next.clearingRows?.length) next = finishLineClear(next);
       if (playerId === 1) room.player1 = next;
       else room.player2 = next;
     } else if (action.type === "move" && action.dir === "down") {
-      const locked = lockPiece(state);
+      let locked = lockPiece(state);
+      if (locked.clearingRows?.length) locked = finishLineClear(locked);
       if (playerId === 1) room.player1 = locked;
       else room.player2 = locked;
     }

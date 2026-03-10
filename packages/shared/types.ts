@@ -48,7 +48,10 @@ export interface PlayerGameState {
 }
 
 /** Full game state for one player (used by client and server) */
-export interface GameState extends PlayerGameState {}
+export interface GameState extends PlayerGameState {
+  /** Row indices currently playing line-clear animation (board still contains these rows until animation ends) */
+  clearingRows?: number[];
+}
 
 /** Line clear scoring: 100, 300, 500, 800 for 1-4 lines */
 export const LINE_SCORES = [0, 100, 300, 500, 800] as const;
