@@ -27,24 +27,6 @@ export function Block({ x, y, width, height, fill }: BlockProps) {
         height={height - 10}
         fill="rgba(255,255,255,0.5)"
       />
-      <rect
-        x={x + 10}
-        y={y + 10}
-        width={width - 20}
-        height={height - 20}
-        fill={fill}
-        rx={4}
-        ry={4}
-      />
-      <rect
-        x={x + 15}
-        y={y + 15}
-        rx={4}
-        ry={4}
-        width={width - 30}
-        height={height - 30}
-        fill="rgba(255,255,255,0.5)"
-      />
     </g>
   );
 }
