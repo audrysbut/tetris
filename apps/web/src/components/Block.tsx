@@ -4,9 +4,11 @@ export interface BlockProps {
   width: number;
   height: number;
   fill: string;
+  rx?: number;
+  ry?: number;
 }
 
-export function Block({ x, y, width, height, fill }: BlockProps) {
+export function Block({ x, y, width, height, fill, rx, ry }: BlockProps) {
   return (
     <g>
       <rect
@@ -15,10 +17,10 @@ export function Block({ x, y, width, height, fill }: BlockProps) {
         width={width}
         height={height}
         fill={fill}
-        rx={4}
-        ry={4}
+        rx={rx ?? 4}
+        ry={ry ?? 4}
       />
-      <rect
+      {/* <rect
         x={x + 5}
         y={y + 5}
         rx={4}
@@ -28,7 +30,7 @@ export function Block({ x, y, width, height, fill }: BlockProps) {
         fill="rgba(255,255,255,0.5)"
         stroke="rgba(0,0,0,1)"
         strokeWidth={2}
-      />
+      /> */}
     </g>
   );
 }
