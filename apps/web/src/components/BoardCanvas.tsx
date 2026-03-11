@@ -15,6 +15,18 @@ interface BoardCanvasProps {
   cellSize?: number;
 }
 
+function makeGradient(id: string, color: string) {
+  return (
+    <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop
+        offset="0%"
+        style={{ stopColor: "rgb(255,255,255,1)", stopOpacity: 1 }}
+      />
+      <stop offset="100%" style={{ stopColor: color, stopOpacity: 1 }} />
+    </linearGradient>
+  );
+}
+
 export function BoardCanvas({
   state,
   width = BOARD_WIDTH,
@@ -46,8 +58,23 @@ export function BoardCanvas({
       style={{ display: "block" }}
       aria-label="Tetris board"
     >
+      <defs>
+        {makeGradient("I", "rgba(34, 211, 211, 1)")}
+        {makeGradient("O", "rgba(250, 204, 21, 1)")}
+        {makeGradient("T", "rgba(192, 132, 252, 1)")}
+        {makeGradient("S", "rgba(74, 222, 128, 1)")}
+        {makeGradient("Z", "rgba(248, 113, 113, 1)")}
+        {makeGradient("J", "rgba(96, 165, 250, 1)")}
+        {makeGradient("L", "rgba(251, 146, 60, 1)")}
+      </defs>
       {/* Background */}
-      <rect width={svgW} height={svgH} fill="rgba(0, 0, 0, 0.7)" rx={8} ry={8} />
+      <rect
+        width={svgW}
+        height={svgH}
+        fill="rgba(0, 0, 0, 0.7)"
+        rx={8}
+        ry={8}
+      />
       {/* Board cells */}
       <BoardCells
         board={board}

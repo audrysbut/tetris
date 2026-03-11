@@ -184,7 +184,7 @@ export function createSeededRng(seed: number): () => number {
   return () => {
     s = (s + 0x6d2b79f5) >>> 0;
     const t = Math.imul(s ^ (s >>> 15), 1 | s);
-    return ((t + (t ^ (t >>> 7)) >>> 0) / 4294967296);
+    return ((t + (t ^ (t >>> 7))) >>> 0) / 4294967296;
   };
 }
 
@@ -212,14 +212,13 @@ export function randomPieceType(): PieceType {
 }
 
 /** Cell colors for rendering: index 0 = empty, 1–7 = I, O, T, S, Z, J, L */
-const OPACITY = 0.8;
 export const CELL_COLORS: string[] = [
   "#000",
-  `rgba(34, 211, 211, ${OPACITY})`, // I – cyan
-  `rgba(250, 204, 21, ${OPACITY})`, // O – amber
-  `rgba(192, 132, 252, ${OPACITY})`, // T – violet
-  `rgba(74, 222, 128, ${OPACITY})`, // S – emerald
-  `rgba(248, 113, 113, ${OPACITY})`, // Z – coral
-  `rgba(96, 165, 250, ${OPACITY})`, // J – sky blue
-  `rgba(251, 146, 60, ${OPACITY})`, // L – orange
+  `url(#I)`, // I – cyan
+  `url(#O)`, // O – amber
+  `url(#T)`, // T – violet
+  `url(#S)`, // S – emerald
+  `url(#Z)`, // Z – coral
+  `url(#J)`, // J – sky blue
+  `url(#L)`, // L – orange
 ];
