@@ -4,6 +4,7 @@ import { SinglePlayerGame } from "./components/SinglePlayerGame.tsx";
 import { Lobby } from "./components/Lobby.tsx";
 import { MultiplayerGame } from "./components/MultiplayerGame.tsx";
 import { BackButton } from "./components/BackButton.tsx";
+import { startMusic, stopMusic } from "./game/music.ts";
 import type { JoinMatchResult } from "./api/match.ts";
 import { randomNatureImageUrl } from "./constants/picsumNatureIds.ts";
 
@@ -39,14 +40,14 @@ function App() {
   const [joinResult, setJoinResult] = useState<JoinMatchResult | null>(null);
 
   if (screen === "single") {
-    return <SinglePlayerScreen onBack={() => setScreen("home")} />;
+    return <SinglePlayerScreen onBack={() => { stopMusic(); setScreen("home"); }} />;
   }
 
   if (screen === "multiplayer" && joinResult) {
     return (
       <MultiplayerGame
         joinResult={joinResult}
-        onBack={() => { setScreen("home"); setJoinResult(null); }}
+        onBack={() => { stopMusic(); setScreen("home"); setJoinResult(null); }}
       />
     );
   }
@@ -54,9 +55,9 @@ function App() {
   if (screen === "lobby") {
     return (
       <>
-        <BackButton onClick={() => setScreen("home")} />
+        <BackButton onClick={() => { stopMusic(); setScreen("home"); }} />
         <Lobby
-          onBack={() => setScreen("home")}
+          onBack={() => { stopMusic(); setScreen("home"); }}
           onJoinGame={(result) => { setJoinResult(result); setScreen("multiplayer"); }}
         />
       </>
@@ -65,8 +66,14 @@ function App() {
 
   return (
     <Home
-      onSinglePlayer={() => setScreen("single")}
-      onMultiplayer={() => setScreen("lobby")}
+      onSinglePlayer={() => {
+        startMusic();
+        setScreen("single");
+      }}
+      onMultiplayer={() => {
+        startMusic();
+        setScreen("lobby");
+      }}
     />
   );
 }
