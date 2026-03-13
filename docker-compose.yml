@@ -7,7 +7,6 @@ services:
       - "5672:5672"   # AMQP (API)
       - "15672:15672" # Management UI
       - "15674:15674" # Web STOMP (browsers: ws://localhost:15674/ws)
-    restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -18,7 +17,6 @@ services:
       dockerfile: apps/api/Dockerfile
     ports:
       - "3000:3000"
-    restart: unless-stopped
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
     depends_on:
@@ -30,4 +28,3 @@ services:
       dockerfile: apps/web/Dockerfile
     ports:
       - "8080:80"
-    restart: unless-stopped
