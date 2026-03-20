@@ -6,9 +6,9 @@
 /** Default track when startMusic() is called with no URL. Set to an MP3 or YouTube link, or leave empty for no default. */
 // export const DEFAULT_MUSIC_URL =
 //   "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-  
-  export const DEFAULT_MUSIC_URL =
-  "https://www.youtube.com/watch?v=WbeEDE4XMEc&list=RDYHEifuLCSIY&index=2";
+
+export const DEFAULT_MUSIC_URL =
+  "https://www.youtube.com/watch?v=A5WZZlTtILo&list=PLP6rFm3TTGwbY98voBz7YvGZJ_sbFFG3S&index=8";
 
 const YOUTUBE_REGEX =
   /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -38,7 +38,7 @@ declare global {
           events?: {
             onReady: (ev: { target: YTPlayer }) => void;
           };
-        }
+        },
       ) => YTPlayer;
     };
     onYouTubeIframeAPIReady?: () => void;
@@ -57,7 +57,8 @@ let ytPendingVideoId: string | null = null;
 let ytScriptLoaded = false;
 
 function loadYouTubeAPI(): Promise<void> {
-  if (typeof document === "undefined") return Promise.reject(new Error("No document"));
+  if (typeof document === "undefined")
+    return Promise.reject(new Error("No document"));
   if (window.YT?.Player) return Promise.resolve();
   if (ytScriptLoaded) {
     return new Promise((resolve) => {
@@ -133,11 +134,13 @@ export function startMusic(url?: string): void {
     ensureYouTubeContainer();
     if (!ytContainer) return;
     ytPendingVideoId = videoId;
-    createYouTubePlayer(videoId).then(() => {
-      if (ytPlayer && ytPendingVideoId === videoId) {
-        ytPlayer.playVideo();
-      }
-    }).catch(() => {});
+    createYouTubePlayer(videoId)
+      .then(() => {
+        if (ytPlayer && ytPendingVideoId === videoId) {
+          ytPlayer.playVideo();
+        }
+      })
+      .catch(() => {});
     return;
   }
 

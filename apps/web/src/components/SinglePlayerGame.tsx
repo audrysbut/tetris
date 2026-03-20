@@ -5,7 +5,7 @@ import { useScreenWakeLock } from "../game/useScreenWakeLock.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, type ChangeEvent } from "react";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
 
 const MAX_CELL_SIZE = 44;
@@ -184,7 +184,7 @@ export function SinglePlayerGame() {
               <input
                 type="checkbox"
                 checked={constantSpeed}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setConstantSpeed(e.target.checked)
                 }
               />

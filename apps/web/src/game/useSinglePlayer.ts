@@ -15,13 +15,12 @@ const LINE_CLEAR_ANIMATION_MS = 400;
 export function useSinglePlayer(constantSpeed = false) {
   const [state, setState] = useState<GameState>(() => createInitialState());
   const [isPaused, setPaused] = useState(false);
-  const [lastTickAt, setLastTickAt] = useState(() => Date.now());
   const intervalRef = useRef<number | null>(null);
 
   const reset = useCallback(() => {
     setState(createInitialState());
     setPaused(false);
-    setLastTickAt(Date.now());
+    // setLastTickAt(Date.now());
   }, []);
 
   // When in line-clear phase, wait for animation then finish clear and spawn next piece
@@ -47,7 +46,6 @@ export function useSinglePlayer(constantSpeed = false) {
       ? DEFAULT_DROP_MS
       : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
     intervalRef.current = setInterval(() => {
-      setLastTickAt(Date.now());
       setState((s) => {
         const next = tick(s);
         if (next) return next;
@@ -65,7 +63,6 @@ export function useSinglePlayer(constantSpeed = false) {
       if (s.clearingRows?.length) return s; // no-op during line-clear animation
       const next = applyAction(s, action);
       if (next) return next;
-      // Maybe lock after move down
       if (action.type === "move" && action.dir === "down") {
         const locked = lockPiece(s);
         return locked;

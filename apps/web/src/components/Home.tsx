@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { getFirstGamepad } from "../game/gamepad.ts";
 
 const AXIS_THRESHOLD = 0.5;
@@ -93,11 +93,11 @@ export function Home({ onSinglePlayer, onMultiplayer }: HomeProps) {
     return () => cancelAnimationFrame(rafId);
   }, []);
 
-  const baseButtonStyle: React.CSSProperties = {
+  const baseButtonStyle: CSSProperties = {
     padding: "12px 24px",
     fontSize: 16,
   };
-  const selectedStyle: React.CSSProperties = {
+  const selectedStyle: CSSProperties = {
     ...baseButtonStyle,
     outline: "2px solid #0af",
     background: "#222",

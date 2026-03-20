@@ -1,12 +1,16 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import preact from "@preact/preset-vite";
 import path from "node:path";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [preact()],
   resolve: {
     alias: {
       "@shared": path.resolve(__dirname, "../../packages/shared"),
+      react: "preact/compat",
+      "react-dom/test-utils": "preact/test-utils",
+      "react-dom": "preact/compat",
+      "react/jsx-runtime": "preact/jsx-runtime",
     },
   },
   server: {
@@ -21,6 +25,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["react/jsx-runtime", "react", "react-dom"],
+    include: ["preact/jsx-runtime", "preact", "preact/compat"],
   },
 });
