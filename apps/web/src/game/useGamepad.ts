@@ -4,10 +4,10 @@ import type { KeyAction } from "./useKeyboard.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
 const AXIS_THRESHOLD = 0.9;
-const REPEAT_MS = 120;
+const REPEAT_MS = 140;
 const SOFT_DROP_REPEAT_MS = 130;
 /** Ignore same-direction input for this long after release to avoid overshoot (stick/d-pad bounce or lag) */
-const RELEASE_COOLDOWN_MS = 200;
+const RELEASE_COOLDOWN_MS = 300;
 /** After releasing left or right, ignore both horizontal directions to avoid opposite-direction stick overshoot */
 const RELEASE_HORIZONTAL_COOLDOWN_MS = 180;
 

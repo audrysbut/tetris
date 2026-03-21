@@ -20,7 +20,6 @@ export function useSinglePlayer(constantSpeed = false) {
   const reset = useCallback(() => {
     setState(createInitialState());
     setPaused(false);
-    // setLastTickAt(Date.now());
   }, []);
 
   // When in line-clear phase, wait for animation then finish clear and spawn next piece
