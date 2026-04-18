@@ -6,16 +6,14 @@ import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
 import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect, useCallback, useRef, type ChangeEvent } from "react";
-import { BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
-
-const MAX_CELL_SIZE = 44;
+import { useFitBoardCellSize } from "../game/useFitBoardCellSize.ts";
 
 export function SinglePlayerGame() {
   const [constantSpeed, setConstantSpeed] = useState(true);
   const { state, isPaused, setPaused, dispatch, reset } = useSinglePlayer(constantSpeed);
   const [elapsedMs, setElapsedMs] = useState(0);
   const boardContainerRef = useRef<HTMLDivElement>(null);
-  const [cellSize, setCellSize] = useState(MAX_CELL_SIZE);
+  const cellSize = useFitBoardCellSize(boardContainerRef);
 
   const handleReset = useCallback(() => {
     setElapsedMs(0);
@@ -28,25 +26,6 @@ export function SinglePlayerGame() {
     const id = setInterval(() => setElapsedMs((e) => e + 100), 100);
     return () => clearInterval(id);
   }, [state.gameOver, isPaused]);
-
-  // Fit board in viewport: measure container and cap cell size so board doesn't overflow
-  useEffect(() => {
-    const el = boardContainerRef.current;
-    if (!el) return;
-    const update = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      if (w <= 0 || h <= 0) return;
-      const sizeByW = w / BOARD_WIDTH;
-      const sizeByH = h / BOARD_HEIGHT;
-      const next = Math.min(sizeByW, sizeByH, MAX_CELL_SIZE);
-      setCellSize(Math.max(8, Math.floor(next)));
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   const handleAction = useCallback(
     (action: KeyAction) => {
@@ -97,6 +76,8 @@ export function SinglePlayerGame() {
         style={{
           display: "flex",
           alignItems: "flex-start",
+          alignSelf: "stretch",
+          width: "100%",
           gap: 12,
           minWidth: 0,
           flex: 1,
@@ -198,9 +179,11 @@ export function SinglePlayerGame() {
             flex: 1,
             minWidth: 0,
             minHeight: 0,
+            alignSelf: "stretch",
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "flex-start",
+            overflow: "hidden",
           }}
         >
           <BoardCanvas state={state} cellSize={cellSize} />
