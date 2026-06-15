@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { getFirstGamepad } from "../game/gamepad.ts";
+import {
+  BUTTON_A,
+  BUTTON_START,
+  BUTTON_DPAD_UP,
+  BUTTON_DPAD_DOWN,
+  AXIS_LEFT_STICK_Y,
+} from "../game/gamepad.constants.ts";
 
 const AXIS_THRESHOLD = 0.5;
 
@@ -67,10 +74,10 @@ export function Home({ onSinglePlayer, onMultiplayer }: HomeProps) {
         return !!btn.pressed || (typeof btn.value === "number" && btn.value > 0);
       });
       const axes = gp.axes ?? [];
-      const axis1 = axes[1] ?? 0;
-      const up = buttons[12] || axis1 < -AXIS_THRESHOLD;
-      const down = buttons[13] || axis1 > AXIS_THRESHOLD;
-      const confirm = buttons[0] || buttons[9];
+      const axis1 = axes[AXIS_LEFT_STICK_Y] ?? 0;
+      const up = buttons[BUTTON_DPAD_UP] || axis1 < -AXIS_THRESHOLD;
+      const down = buttons[BUTTON_DPAD_DOWN] || axis1 > AXIS_THRESHOLD;
+      const confirm = buttons[BUTTON_A] || buttons[BUTTON_START];
 
       const prev = prevRef;
       if (up && !prev.up) setSelectedIndex(0);
