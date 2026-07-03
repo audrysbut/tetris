@@ -54,7 +54,6 @@ export function useMultiPlayer({
   const [oppState, setOppState] = useState<PlayerStateUpdate | null>(null);
   const intervalRef = useRef<number | null>(null);
   const startedRef = useRef(false);
-  const sentStartRef = useRef(false);
   const gameStatusRef = useRef(gameStatus);
   gameStatusRef.current = gameStatus;
 
@@ -62,21 +61,24 @@ export function useMultiPlayer({
     if (!connected) {
       setGameStatus("connecting");
       startedRef.current = false;
-      sentStartRef.current = false;
       return;
     }
     if (isHost) {
+      const s = createInitialState();
+      send({ type: "seed", seed: s.pieceSeed });
+      setMyState(s);
       setGameStatus("playing");
       startedRef.current = true;
     } else {
       setGameStatus("waiting");
     }
-  }, [connected, isHost]);
+  }, [connected, isHost, send]);
 
   useEffect(() => {
     const unsub = onData((data: unknown) => {
       const msg = data as Record<string, unknown>;
-      if (msg.type === "start") {
+      if (msg.type === "seed") {
+        setMyState(createInitialState(msg.seed as number));
         setGameStatus("playing");
         startedRef.current = true;
       } else if (msg.type === "sync" && msg.playerId !== myPlayerId) {
@@ -88,13 +90,6 @@ export function useMultiPlayer({
     });
     return unsub;
   }, [onData, myPlayerId]);
-
-  useEffect(() => {
-    if (gameStatus === "playing" && isHost && !sentStartRef.current) {
-      sentStartRef.current = true;
-      send({ type: "start" });
-    }
-  }, [gameStatus, isHost, send]);
 
   useEffect(() => {
     const clearing = myState.clearingRows?.length;
