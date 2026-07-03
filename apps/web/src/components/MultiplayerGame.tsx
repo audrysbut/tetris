@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useFitBoardCellSize } from "../game/useFitBoardCellSize.ts";
 import { useWebStomp } from "../game/useWebStomp.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
 import { useGamepad } from "../game/useGamepad.ts";
@@ -35,6 +36,10 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
   const { connect, disconnect, subscribe, send } = useWebStomp();
   const unsubRef = useRef<(() => void) | null>(null);
   const gameAreaRef = useRef<HTMLDivElement>(null);
+  const myBoardRef = useRef<HTMLDivElement>(null);
+  const oppBoardRef = useRef<HTMLDivElement>(null);
+  const myCellSize = useFitBoardCellSize(myBoardRef);
+  const oppCellSize = useFitBoardCellSize(oppBoardRef);
 
   useEffect(() => {
     setConnectionError(null);
@@ -166,8 +171,23 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
             style={{ outline: "none" }}
             aria-label="Game area - use keyboard or gamepad to move pieces"
           >
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-            <div>
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              flexWrap: "wrap",
+              alignItems: "stretch",
+            }}
+          >
+            <div
+              style={{
+                flex: "1 1 260px",
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
               <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>You (Player {playerId})</h3>
               <HUD
                 score={myState.score}
@@ -176,9 +196,30 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
                 gameOver={myState.gameOver}
                 isPaused={false}
               />
-              <BoardCanvas state={myState} />
+              <div
+                ref={myBoardRef}
+                style={{
+                  width: "100%",
+                  minHeight: 160,
+                  height: "min(68dvh, 720px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <BoardCanvas state={myState} cellSize={myCellSize} />
+              </div>
             </div>
-            <div>
+            <div
+              style={{
+                flex: "1 1 260px",
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
               <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>Opponent</h3>
               <HUD
                 score={oppState.score}
@@ -187,7 +228,20 @@ export function MultiplayerGame({ joinResult, onBack }: MultiplayerGameProps) {
                 gameOver={oppState.gameOver}
                 isPaused={false}
               />
-              <BoardCanvas state={oppState} />
+              <div
+                ref={oppBoardRef}
+                style={{
+                  width: "100%",
+                  minHeight: 160,
+                  height: "min(68dvh, 720px)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <BoardCanvas state={oppState} cellSize={oppCellSize} />
+              </div>
             </div>
           </div>
           {room?.status === "finished" && room.winnerId != null && (

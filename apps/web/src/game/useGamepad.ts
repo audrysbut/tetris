@@ -1,13 +1,30 @@
 import { useEffect, useRef, useCallback } from "react";
 import { getFirstGamepad } from "./gamepad.ts";
 import type { KeyAction } from "./useKeyboard.ts";
+import {
+  BUTTON_A,
+  BUTTON_B,
+  BUTTON_X,
+  BUTTON_Y,
+  BUTTON_RB,
+  BUTTON_START,
+  BUTTON_DPAD_UP,
+  BUTTON_DPAD_DOWN,
+  BUTTON_DPAD_LEFT,
+  BUTTON_DPAD_RIGHT,
+  BUTTON_HOME,
+  AXIS_LEFT_STICK_X,
+  AXIS_LEFT_STICK_Y,
+  AXIS_DPAD_X,
+  AXIS_DPAD_Y,
+} from "./gamepad.constants.ts";
 
 const AXIS_DEAD_ZONE = 0.25;
-const AXIS_THRESHOLD = 0.6;
-const REPEAT_MS = 130;
+const AXIS_THRESHOLD = 0.9;
+const REPEAT_MS = 140;
 const SOFT_DROP_REPEAT_MS = 130;
 /** Ignore same-direction input for this long after release to avoid overshoot (stick/d-pad bounce or lag) */
-const RELEASE_COOLDOWN_MS = 180;
+const RELEASE_COOLDOWN_MS = 300;
 /** After releasing left or right, ignore both horizontal directions to avoid opposite-direction stick overshoot */
 const RELEASE_HORIZONTAL_COOLDOWN_MS = 180;
 
@@ -49,32 +66,32 @@ export function useGamepad(
       return !!btn.pressed || (typeof btn.value === "number" && btn.value > 0);
     });
     const axes = gp.axes ?? [];
-    const axis0 = axes[0] ?? 0;
-    const axis1 = axes[1] ?? 0;
-    const axis6 = axes[6] ?? 0;
-    const axis7 = axes[7] ?? 0;
+    const axis0 = axes[AXIS_LEFT_STICK_X] ?? 0;
+    const axis1 = axes[AXIS_LEFT_STICK_Y] ?? 0;
+    const axis6 = axes[AXIS_DPAD_X] ?? 0;
+    const axis7 = axes[AXIS_DPAD_Y] ?? 0;
 
     const left =
-      !!buttons[14] || (axis0 < -AXIS_DEAD_ZONE && axis0 <= -AXIS_THRESHOLD) ||
+      !!buttons[BUTTON_DPAD_LEFT] || (axis0 < -AXIS_DEAD_ZONE && axis0 <= -AXIS_THRESHOLD) ||
       (axis6 < -AXIS_THRESHOLD);
     const right =
-      !!buttons[15] || (axis0 > AXIS_DEAD_ZONE && axis0 >= AXIS_THRESHOLD) ||
+      !!buttons[BUTTON_DPAD_RIGHT] || (axis0 > AXIS_DEAD_ZONE && axis0 >= AXIS_THRESHOLD) ||
       (axis6 > AXIS_THRESHOLD);
     const down =
-      !!buttons[13] ||
+      !!buttons[BUTTON_DPAD_DOWN] ||
       (axis1 > AXIS_DEAD_ZONE && axis1 >= AXIS_THRESHOLD) ||
       (axis7 > AXIS_THRESHOLD);
-    const rotate = !!buttons[0] || !!buttons[1] || !!buttons[2];
-    const hardDrop = !!buttons[3] || !!buttons[5] || !!buttons[12] ||
+    const rotate = !!buttons[BUTTON_A] || !!buttons[BUTTON_B] || !!buttons[BUTTON_X];
+    const hardDrop = !!buttons[BUTTON_Y] || !!buttons[BUTTON_RB] || !!buttons[BUTTON_DPAD_UP] ||
       (axis7 < -AXIS_DEAD_ZONE && axis7 <= -AXIS_THRESHOLD) ||
       (axis1 < -AXIS_THRESHOLD);
-    const pause = !!buttons[9];
+    const pause = !!buttons[BUTTON_START];
 
     const fire = (action: KeyAction) => onActionRef.current(action);
 
-    const wasLeft = !!prev.buttons[14] || prev.axisLeftRight < -AXIS_THRESHOLD;
-    const wasRight = !!prev.buttons[15] || prev.axisLeftRight > AXIS_THRESHOLD;
-    const wasDown = !!prev.buttons[13] || prev.axisDown >= AXIS_THRESHOLD;
+    const wasLeft = !!prev.buttons[BUTTON_DPAD_LEFT] || prev.axisLeftRight < -AXIS_THRESHOLD;
+    const wasRight = !!prev.buttons[BUTTON_DPAD_RIGHT] || prev.axisLeftRight > AXIS_THRESHOLD;
+    const wasDown = !!prev.buttons[BUTTON_DPAD_DOWN] || prev.axisDown >= AXIS_THRESHOLD;
     const now = Date.now();
 
     if (left) {
@@ -123,11 +140,11 @@ export function useGamepad(
       repeatRef.current.lastDown = 0;
     }
 
-    if (rotate && !(prev.buttons[0] || prev.buttons[1] || prev.buttons[2])) fire("rotate");
-    if (hardDrop && !(prev.buttons[3] || prev.buttons[5] || prev.buttons[12]) &&
+    if (rotate && !(prev.buttons[BUTTON_A] || prev.buttons[BUTTON_B] || prev.buttons[BUTTON_X])) fire("rotate");
+    if (hardDrop && !(prev.buttons[BUTTON_Y] || prev.buttons[BUTTON_RB] || prev.buttons[BUTTON_DPAD_UP]) &&
         !(prev.axisUp <= -AXIS_THRESHOLD)) fire("hardDrop");
-    if (pause && !prev.buttons[9]) fire("pause");
-    if (!!buttons[16] && !prev.buttons[16]) onHomeRef.current?.();
+    if (pause && !prev.buttons[BUTTON_START]) fire("pause");
+    if (!!buttons[BUTTON_HOME] && !prev.buttons[BUTTON_HOME]) onHomeRef.current?.();
 
     prevRef.current = {
       buttons,

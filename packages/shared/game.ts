@@ -8,7 +8,12 @@ import {
   type PieceType,
   type Position,
 } from "./types.ts";
-import { getShape, randomPieceType } from "./pieces.ts";
+import { getShape, pieceAtSeed } from "./pieces.ts";
+
+/** Generate a random seed for single-player when no seed is provided. */
+function generateRandomSeed(): number {
+  return (Math.floor(Math.random() * 0xffffffff) >>> 0);
+}
 
 /** Create an empty board */
 export function createEmptyBoard(): Board {
@@ -124,12 +129,13 @@ export function wouldSpawnCollide(board: Board, pieceType: PieceType): boolean {
   return collides(board, piece);
 }
 
-/** Create initial game state */
-export function createInitialState(seedNext?: PieceType): GameState {
-  const first = randomPieceType();
-  const next = seedNext ?? randomPieceType();
+/** Create initial game state. Pass optional numeric seed for deterministic piece sequence; omit for random seed. */
+export function createInitialState(seed?: number): GameState {
+  const s = seed !== undefined ? seed >>> 0 : generateRandomSeed();
+  const first = pieceAtSeed(s, 0);
+  const next = pieceAtSeed(s, 1);
   const pos = spawnPosition(first);
-  return {
+  const returnState: GameState = {
     board: createEmptyBoard(),
     currentPiece: {
       type: first,
@@ -141,7 +147,10 @@ export function createInitialState(seedNext?: PieceType): GameState {
     lines: 0,
     gameOver: false,
     level: 1,
+    pieceSeed: s,
+    pieceIndex: 2,
   };
+  return returnState;
 }
 
 /** Apply gravity: move piece down one row if possible; returns new state or null if locked */
@@ -214,7 +223,7 @@ export function rotate(state: GameState): GameState | null {
 /** Hard drop: move piece to bottom, then lock (may start line-clear animation). */
 export function hardDrop(state: GameState): GameState {
   if (state.gameOver || !state.currentPiece) return state;
-  let s = { ...state };
+  const s = { ...state };
   let piece = s.currentPiece!;
   while (!collides(s.board, piece, { x: 0, y: 1 })) {
     piece = {
@@ -235,6 +244,8 @@ export function lockPiece(state: GameState): GameState {
     const nextType = state.nextPieceType;
     const spawnPos = spawnPosition(nextType);
     const wouldCollide = wouldSpawnCollide(newBoard, nextType);
+    const nextPiece = wouldCollide ? state.nextPieceType : pieceAtSeed(state.pieceSeed, state.pieceIndex);
+    const nextIndex = wouldCollide ? state.pieceIndex : state.pieceIndex + 1;
     return {
       ...state,
       board: newBoard,
@@ -245,7 +256,8 @@ export function lockPiece(state: GameState): GameState {
             rotation: 0,
             position: spawnPos,
           },
-      nextPieceType: wouldCollide ? state.nextPieceType : randomPieceType(),
+      nextPieceType: nextPiece,
+      pieceIndex: nextIndex,
       gameOver: wouldCollide,
     };
   }
@@ -266,6 +278,8 @@ export function finishLineClear(state: GameState): GameState {
   const nextType = state.nextPieceType;
   const spawnPos = spawnPosition(nextType);
   const wouldCollide = wouldSpawnCollide(newBoard, nextType);
+  const nextPiece = wouldCollide ? state.nextPieceType : pieceAtSeed(state.pieceSeed, state.pieceIndex);
+  const nextIndex = wouldCollide ? state.pieceIndex : state.pieceIndex + 1;
   const newState: GameState = {
     ...state,
     board: newBoard,
@@ -280,7 +294,8 @@ export function finishLineClear(state: GameState): GameState {
           rotation: 0,
           position: spawnPos,
         },
-    nextPieceType: wouldCollide ? state.nextPieceType : randomPieceType(),
+    nextPieceType: nextPiece,
+    pieceIndex: nextIndex,
     gameOver: wouldCollide,
   };
   return newState;

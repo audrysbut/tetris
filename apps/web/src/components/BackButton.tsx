@@ -1,8 +1,10 @@
+import type { CSSProperties } from "react";
+
 interface BackButtonProps {
   onClick: () => void;
 }
 
-const backButtonStyle: React.CSSProperties = {
+const backButtonStyle: CSSProperties = {
   position: "absolute",
   top: 8,
   left: 8,

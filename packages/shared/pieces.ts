@@ -178,20 +178,47 @@ export function getShape(type: PieceType, rotation: number): number[][] {
 /** All piece types for random selection */
 export const PIECE_TYPES: PieceType[] = [0, 1, 2, 3, 4, 5, 6];
 
-/** Return a random piece type */
+/** Seeded PRNG (mulberry32). Returns a function that yields values in [0, 1). */
+export function createSeededRng(seed: number): () => number {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    const t = Math.imul(s ^ (s >>> 15), 1 | s);
+    return ((t + (t ^ (t >>> 7))) >>> 0) / 4294967296;
+  };
+}
+
+/** Fisher–Yates shuffle of [0..6] using seeded RNG; returns a new array. */
+function getShuffledBag(seed: number, bagIndex: number): PieceType[] {
+  const rng = createSeededRng((seed * 31 + bagIndex) >>> 0);
+  const arr: PieceType[] = [0, 1, 2, 3, 4, 5, 6];
+  for (let i = 0; i < 7; i++) {
+    const j = i + Math.floor(rng() * (7 - i));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/** Deterministic piece at index: same (seed, index) always returns same piece (7-bag). */
+export function pieceAtSeed(seed: number, index: number): PieceType {
+  const bagIndex = Math.floor(index / 7);
+  const pos = index % 7;
+  return getShuffledBag(seed, bagIndex)[pos];
+}
+
+/** Return a random piece type (non-deterministic; for non-game use if needed) */
 export function randomPieceType(): PieceType {
   return PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
 }
 
 /** Cell colors for rendering: index 0 = empty, 1–7 = I, O, T, S, Z, J, L */
-const OPACITY = 0.8;
 export const CELL_COLORS: string[] = [
   "#000",
-  `rgba(34, 211, 211, ${OPACITY})`, // I – cyan
-  `rgba(250, 204, 21, ${OPACITY})`, // O – amber
-  `rgba(192, 132, 252, ${OPACITY})`, // T – violet
-  `rgba(74, 222, 128, ${OPACITY})`, // S – emerald
-  `rgba(248, 113, 113, ${OPACITY})`, // Z – coral
-  `rgba(96, 165, 250, ${OPACITY})`, // J – sky blue
-  `rgba(251, 146, 60, ${OPACITY})`, // L – orange
+  `url(#I)`, // I – cyan
+  `url(#O)`, // O – amber
+  `url(#T)`, // T – violet
+  `url(#S)`, // S – emerald
+  `url(#Z)`, // Z – coral
+  `url(#J)`, // J – sky blue
+  `url(#L)`, // L – orange
 ];
