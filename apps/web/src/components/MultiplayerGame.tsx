@@ -120,7 +120,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 style={{
                   width: "100%",
                   minHeight: 160,
-                  height: "min(78dvh, 720px)",
+                  height: "78dvh",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -152,7 +152,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 style={{
                   width: "100%",
                   minHeight: 160,
-                  height: "min(78dvh, 720px)",
+                  height: "78dvh",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
