@@ -108,6 +108,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
               gap: 8,
               flex: 1,
               minHeight: 0,
+              alignSelf: "stretch",
             }}
           >
             <div
@@ -116,7 +117,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 minWidth: 0,
                 display: "flex",
                 flexDirection: "column",
-                gap: 4,
+                gap: 2,
               }}
             >
               <h3 style={{ margin: 0, fontSize: 14, flexShrink: 0, color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000" }}>
@@ -134,8 +135,9 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 style={{
                   flex: 1,
                   minHeight: 0,
+                  alignSelf: "stretch",
                   display: "flex",
-                  alignItems: "center",
+                  alignItems: "flex-start",
                   justifyContent: "center",
                   overflow: "hidden",
                 }}
@@ -149,7 +151,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 minWidth: 0,
                 display: "flex",
                 flexDirection: "column",
-                gap: 4,
+                gap: 2,
               }}
             >
               <h3 style={{ margin: 0, fontSize: 14, flexShrink: 0, color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000" }}>Opponent</h3>
@@ -165,8 +167,9 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 style={{
                   flex: 1,
                   minHeight: 0,
+                  alignSelf: "stretch",
                   display: "flex",
-                  alignItems: "center",
+                  alignItems: "flex-start",
                   justifyContent: "center",
                   overflow: "hidden",
                 }}
