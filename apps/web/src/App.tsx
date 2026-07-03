@@ -92,13 +92,25 @@ function App() {
 
   if (screen === "multiplayer") {
     return (
-      <>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          backgroundImage: `url('${randomNatureImageUrl()}')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          color: "#eee",
+        }}
+      >
         <MusicMuteButton muted={musicMuted} onToggle={toggleMute} />
         <MultiplayerGame
           peerConnection={pc}
           onBack={goHome}
         />
-      </>
+      </div>
     );
   }
 
