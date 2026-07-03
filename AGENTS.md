@@ -6,14 +6,14 @@ Deno workspace monorepo (`deno.json` at root):
 
 ```
 apps/web/     — Preact SPA (Vite, aliased as React via `preact/compat`)
-packages/shared/  — Board types, piece logic, game engine
+  src/shared/ — Board types, piece logic, game engine
 ```
 
 ## Commands
 
 ```sh
-deno task web:dev    # Vite dev server on :4200 — single-player + P2P multiplayer
-deno task web:build  # Production build
+deno task dev    # Vite dev server on :4200 — single-player + P2P multiplayer
+deno task build  # Production build
 ```
 
 - Web app builds via: `deno task --cwd apps/web build` (runs `node ./node_modules/vite/bin/vite.js build`)

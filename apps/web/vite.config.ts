@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [preact()],
   resolve: {
     alias: {
-      "@shared": path.resolve(__dirname, "../../packages/shared"),
+      "@shared": path.resolve(__dirname, "src/shared"),
       react: "preact/compat",
       "react-dom/test-utils": "preact/test-utils",
       "react-dom": "preact/compat",
