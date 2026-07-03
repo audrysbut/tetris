@@ -73,7 +73,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
   const showWaiting = multi.gameStatus === "waiting";
 
   return (
-    <div style={{ padding: 8 }}>
+    <div style={{ height: "100dvh", padding: 8, display: "flex", flexDirection: "column" }}>
       <BackButton onClick={onBack} />
       {multi.gameStatus === "connecting" && (
         <p>Establishing connection…</p>
@@ -85,7 +85,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
         <div
           ref={gameAreaRef}
           tabIndex={0}
-          style={{ outline: "none" }}
+          style={{ outline: "none", flex: 1, display: "flex", flexDirection: "column" }}
           aria-label="Game area - use keyboard or gamepad to move pieces"
         >
           <div
@@ -93,7 +93,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
               display: "flex",
               gap: 16,
               flexWrap: "wrap",
-              alignItems: "stretch",
+              flex: 1,
             }}
           >
             <div
@@ -105,7 +105,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 gap: 8,
               }}
             >
-              <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>
+              <h3 style={{ margin: 0, fontSize: 14 }}>
                 You (Player {multi.myPlayerId})
               </h3>
               <HUD
@@ -119,8 +119,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 ref={myBoardRef}
                 style={{
                   width: "100%",
-                  minHeight: 160,
-                  height: "78dvh",
+                  flex: 1,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -139,7 +138,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 gap: 8,
               }}
             >
-              <h3 style={{ margin: "0 0 4px", fontSize: 14 }}>Opponent</h3>
+              <h3 style={{ margin: 0, fontSize: 14 }}>Opponent</h3>
               <HUD
                 score={oppGameState.score}
                 lines={oppGameState.lines}
@@ -151,8 +150,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
                 ref={oppBoardRef}
                 style={{
                   width: "100%",
-                  minHeight: 160,
-                  height: "78dvh",
+                  flex: 1,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
