@@ -165,10 +165,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
           </div>
           {multi.gameStatus === "finished" && multi.winnerId != null && (
             <p style={{ marginTop: 8, fontSize: 16, fontWeight: "bold" }}>
-              {multi.winnerId === multi.myPlayerId
-                ? "You win!"
-                : "You lose!"}{" "}
-              Winner: highest score when someone topped out.
+              {multi.winnerId === multi.myPlayerId ? "You win!" : "You lose!"}
             </p>
           )}
         </div>

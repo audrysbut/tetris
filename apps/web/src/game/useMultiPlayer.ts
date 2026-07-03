@@ -83,7 +83,7 @@ export function useMultiPlayer({
         setOppState(msg.state as PlayerStateUpdate);
       } else if (msg.type === "gameEnd") {
         setGameStatus("finished");
-        setWinnerId(msg.playerId as number);
+        setWinnerId(myPlayerId);
       }
     });
     return unsub;
@@ -137,9 +137,10 @@ export function useMultiPlayer({
 
   useEffect(() => {
     if (myState.gameOver) {
-      send({ type: "gameEnd", playerId: myPlayerId });
+      const opponentId = myPlayerId === 1 ? 2 : 1;
+      send({ type: "gameEnd", winnerId: opponentId });
       setGameStatus("finished");
-      setWinnerId(myPlayerId);
+      setWinnerId(opponentId);
     }
   }, [myState.gameOver, myPlayerId, send]);
 
