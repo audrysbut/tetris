@@ -3,6 +3,7 @@ import preact from "@preact/preset-vite";
 import path from "node:path";
 
 export default defineConfig({
+  base: "/tetris/",
   plugins: [preact()],
   resolve: {
     alias: {
