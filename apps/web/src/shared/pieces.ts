@@ -175,11 +175,8 @@ export function getShape(type: PieceType, rotation: number): number[][] {
   return SHAPES[type][r].map((row) => [...row]);
 }
 
-/** All piece types for random selection */
-export const PIECE_TYPES: PieceType[] = [0, 1, 2, 3, 4, 5, 6];
-
 /** Seeded PRNG (mulberry32). Returns a function that yields values in [0, 1). */
-export function createSeededRng(seed: number): () => number {
+function createSeededRng(seed: number): () => number {
   let s = seed >>> 0;
   return () => {
     s = (s + 0x6d2b79f5) >>> 0;
@@ -191,12 +188,12 @@ export function createSeededRng(seed: number): () => number {
 /** Fisher–Yates shuffle of [0..6] using seeded RNG; returns a new array. */
 function getShuffledBag(seed: number, bagIndex: number): PieceType[] {
   const rng = createSeededRng((seed * 31 + bagIndex) >>> 0);
-  const arr: PieceType[] = [0, 1, 2, 3, 4, 5, 6];
+  const types: PieceType[] = [0, 1, 2, 3, 4, 5, 6];
   for (let i = 0; i < 7; i++) {
     const j = i + Math.floor(rng() * (7 - i));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    [types[i], types[j]] = [types[j], types[i]];
   }
-  return arr;
+  return types;
 }
 
 /** Deterministic piece at index: same (seed, index) always returns same piece (7-bag). */
@@ -204,11 +201,6 @@ export function pieceAtSeed(seed: number, index: number): PieceType {
   const bagIndex = Math.floor(index / 7);
   const pos = index % 7;
   return getShuffledBag(seed, bagIndex)[pos];
-}
-
-/** Return a random piece type (non-deterministic; for non-game use if needed) */
-export function randomPieceType(): PieceType {
-  return PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
 }
 
 /** Cell colors for rendering: index 0 = empty, 1–7 = I, O, T, S, Z, J, L */

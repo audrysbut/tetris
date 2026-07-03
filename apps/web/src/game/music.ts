@@ -7,7 +7,7 @@
 // export const DEFAULT_MUSIC_URL =
 //   "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
-export const DEFAULT_MUSIC_URL =
+const DEFAULT_MUSIC_URL =
   "https://www.youtube.com/watch?v=A5WZZlTtILo&list=PLP6rFm3TTGwbY98voBz7YvGZJ_sbFFG3S&index=8";
 
 const YOUTUBE_REGEX =
@@ -16,10 +16,6 @@ const YOUTUBE_REGEX =
 function getYouTubeVideoId(url: string): string | null {
   const m = url.trim().match(YOUTUBE_REGEX);
   return m ? m[1]! : null;
-}
-
-function isYouTubeUrl(url: string): boolean {
-  return getYouTubeVideoId(url) !== null;
 }
 
 // --- MP3 / direct audio ---
@@ -173,24 +169,4 @@ export function stopMusic(): void {
   }
 }
 
-/**
- * Pause or resume music (for game pause).
- */
-export function setMusicPaused(paused: boolean): void {
-  if (audio) {
-    if (paused) audio.pause();
-    else audio.play().catch(() => {});
-  }
-  if (ytPlayer) {
-    try {
-      if (paused) ytPlayer.pauseVideo();
-      else ytPlayer.playVideo();
-    } catch {
-      // ignore
-    }
-  }
-}
 
-export function resumeMusic(): void {
-  setMusicPaused(false);
-}

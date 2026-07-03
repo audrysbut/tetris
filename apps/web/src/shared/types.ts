@@ -27,17 +27,12 @@ export interface CurrentPiece {
   position: Position;
 }
 
-/** Action types for multiplayer */
-export type MoveDirection = "left" | "right" | "down";
-export type ActionType = "move" | "rotate" | "softDrop" | "hardDrop";
-
 export interface GameAction {
-  type: ActionType;
-  dir?: MoveDirection;
+  type: "move" | "rotate" | "softDrop" | "hardDrop";
+  dir?: "left" | "right" | "down";
 }
 
-/** Single player's game state (one board) */
-export interface PlayerGameState {
+interface PlayerGameState {
   board: Board;
   currentPiece: CurrentPiece | null;
   nextPieceType: PieceType;

@@ -44,11 +44,7 @@ export function BoardCanvas({
     ghost &&
     (ghost.position.x !== currentPiece.position.x ||
       ghost.position.y !== currentPiece.position.y);
-  const effectiveY =
-    currentPiece && ghost
-      ? currentPiece.position.y +
-        (currentPiece.position.y === ghost.position.y ? 0 : 0)
-      : 0;
+  const effectiveY = currentPiece ? currentPiece.position.y : 0;
 
   return (
     <svg

@@ -16,14 +16,14 @@ function generateRandomSeed(): number {
 }
 
 /** Create an empty board */
-export function createEmptyBoard(): Board {
+function createEmptyBoard(): Board {
   return Array.from({ length: BOARD_HEIGHT }, () =>
     Array.from({ length: BOARD_WIDTH }, () => 0)
   );
 }
 
 /** Deep clone board */
-export function cloneBoard(board: Board): Board {
+function cloneBoard(board: Board): Board {
   return board.map((row) => [...row]);
 }
 

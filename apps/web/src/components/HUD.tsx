@@ -55,7 +55,6 @@ interface NextPieceProps {
 }
 
 const NEXT_CELL = 16;
-const NEXT_INSET = 2; // proportional to Block's inner rect
 
 export function NextPiece({ nextPieceType }: NextPieceProps) {
   const shape = getShape(nextPieceType, 0);
