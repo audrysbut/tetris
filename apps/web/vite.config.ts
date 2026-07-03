@@ -1,9 +1,13 @@
 import { defineConfig } from "vite";
 import preact from "@preact/preset-vite";
 import path from "node:path";
+import { fileURLToPath } from "node:url"; // Import this for ES modules
 
-export default defineConfig({
-  base: "/tetris/",
+// Define __dirname manually if using ES modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig(({ command }) => ({
+  base: command === "serve" ? "/" : "/tetris/",
   plugins: [preact()],
   resolve: {
     alias: {
@@ -28,4 +32,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ["preact/jsx-runtime", "preact", "preact/compat"],
   },
-});
+}));
