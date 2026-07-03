@@ -89,19 +89,19 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
       {showWaiting && (
         <p style={{ flexShrink: 0 }}>Waiting for opponent…</p>
       )}
-      {gameActive && (
-        <div
-          ref={gameAreaRef}
-          tabIndex={0}
-          style={{
-            outline: "none",
-            flex: 1,
-            minHeight: 0,
-            display: "flex",
-            flexDirection: "column",
-          }}
-          aria-label="Game area - use keyboard or gamepad to move pieces"
-        >
+      <div
+        ref={gameAreaRef}
+        tabIndex={gameActive ? 0 : -1}
+        style={{
+          outline: "none",
+          flex: gameActive ? 1 : 0,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+        aria-label={gameActive ? "Game area - use keyboard or gamepad to move pieces" : undefined}
+      >
           <div
             style={{
               display: "flex",
@@ -184,7 +184,6 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
             </p>
           )}
         </div>
-      )}
     </div>
   );
 }
