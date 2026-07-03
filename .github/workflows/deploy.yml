@@ -21,9 +21,9 @@ jobs:
 
       - run: deno task build
 
-      - uses: actions/upload-pages-artifact@v5  # <-- Upgraded from v3 to v5
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: apps/web/dist
 
       - id: deployment
-        uses: actions/deploy-pages@v5          # <-- Upgraded from v4 to v5
+        uses: actions/deploy-pages@v4

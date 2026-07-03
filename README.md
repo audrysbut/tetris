@@ -1,40 +1,20 @@
 # Tetris: Single-Player and 2P Multiplayer
 
 - **Single player:** Play in the browser (no server required).
-- **Multiplayer:** 2 players via RabbitMQ Web STOMP; winner = highest score when one tops out.
+- **Multiplayer:** 2 players via **P2P WebRTC** (PeerJS). No server needed — the host creates a room, the guest joins with a 6-character code. Each player runs their own game engine locally and syncs state over a direct peer-to-peer data channel.
 
 ## Run locally
 
-### Single player only
-
 ```bash
-deno task web:dev
+deno task dev    # Vite dev server on :4200
 ```
 
-Open http://localhost:4200 → Single player.
+Open http://localhost:4200 → choose Single Player or Multiplayer.
 
-### With multiplayer (API + RabbitMQ + UI)
-
-```bash
-docker compose up -d
-```
-
-Or with a rebuild: `docker compose up -d --build`
-
-- **UI:** http://localhost:8080 (single-player and multiplayer)
-- API: http://localhost:3000
-- RabbitMQ Management: http://localhost:15672 (guest/guest)
-- **Web STOMP (browsers):** `ws://localhost:15674/ws` — use this URL in the frontend for STOMP over WebSocket.
-
-### Dev (all apps)
+### Production build
 
 ```bash
-deno task dev          # API + web (no RabbitMQ)
-docker compose up -d rabbitmq   # start RabbitMQ for multiplayer
+deno task build  # Outputs to apps/web/dist/
 ```
 
-**Environment (optional):**
-
-- **Web app:** `VITE_API_URL` – API base URL (default `http://localhost:3000`).  
-  `VITE_RABBITMQ_WEB_STOMP_URL` – Web STOMP URL (default `ws://localhost:15674/ws`).
-- **API:** `RABBITMQ_URL` – AMQP URL (default `amqp://guest:guest@localhost:5672`; use `amqp://guest:guest@rabbitmq:5672` in Docker).
+A `Dockerfile` is also available at `apps/web/` for containerized deployment (nginx serving the static build, port 80).
