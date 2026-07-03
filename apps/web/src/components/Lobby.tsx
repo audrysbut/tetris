@@ -1,39 +1,24 @@
 import { useState } from "react";
-import { createMatch, joinMatch } from "../api/match.ts";
-import type { CreateMatchResult, JoinMatchResult } from "../api/match.ts";
+import type { UsePeerConnectionReturn } from "../game/usePeerConnection.ts";
 
 interface LobbyProps {
-  onBack: () => void;
-  onJoinGame: (result: JoinMatchResult) => void;
+  peerConnection: UsePeerConnectionReturn;
 }
 
-export function Lobby({ onBack, onJoinGame }: LobbyProps) {
+export function Lobby({ peerConnection }: LobbyProps) {
   const [creating, setCreating] = useState(false);
   const [joinId, setJoinId] = useState("");
   const [joining, setJoining] = useState(false);
-  const [error, setError] = useState("");
-  const [created, setCreated] = useState<CreateMatchResult | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const { createRoom, joinRoom, roomCode, connectionError, connected } = peerConnection;
+
   const handleCreate = async () => {
-    setError("");
-    setCreated(null);
     setCreating(true);
     try {
-      const result = await createMatch();
-      if (!result?.matchId) {
-        setError("Invalid response from server (missing matchId)");
-        return;
-      }
-      const joinResult = await joinMatch(result.matchId);
-      if ("error" in joinResult) {
-        setError(joinResult.error);
-        return;
-      }
-      setCreated(result);
-      onJoinGame(joinResult);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to create match");
+      await createRoom();
+    } catch {
+      // error displayed via connectionError
     } finally {
       setCreating(false);
     }
@@ -41,27 +26,23 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
 
   const handleJoin = async () => {
     if (!joinId.trim()) return;
-    setError("");
     setJoining(true);
     try {
-      const result = await joinMatch(joinId.trim());
-      if ("error" in result) {
-        setError(result.error);
-        return;
-      }
-      onJoinGame(result);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to join");
+      await joinRoom(joinId.trim());
+    } catch {
+      // error displayed via connectionError
     } finally {
       setJoining(false);
     }
   };
 
+  const showWaiting = roomCode && !connected;
+
   return (
     <div style={{ padding: 24, maxWidth: 480, margin: "0 auto" }}>
       <h2>Multiplayer Lobby</h2>
       <p style={{ color: "#666" }}>
-        Create a match and share the match ID with a friend, or enter a match ID to join.
+        Create a match and share the room code with a friend, or enter a code to join.
       </p>
 
       <section style={{ marginBottom: 24 }}>
@@ -69,26 +50,29 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
         <button type="button" onClick={handleCreate} disabled={creating}>
           {creating ? "Creating…" : "Create match"}
         </button>
-        {created && (
-          <div style={{ marginTop: 8, padding: 8, background: "#eee", borderRadius: 4 }}>
-            <p style={{ margin: 0, fontWeight: "bold" }}>
-              Match ID: {created.matchId}
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(created.matchId).then(() => {
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  });
-                }}
-                style={{ marginLeft: 8, padding: "2px 8px", fontSize: 12 }}
-              >
-                {copied ? "Copied!" : "Copy"}
-              </button>
-            </p>
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: "#666" }}>
-              Share this ID with the other player. When they join, you’ll both enter the game.
-            </p>
+        {showWaiting && (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ padding: 8, background: "#eee", borderRadius: 4 }}>
+              <p style={{ margin: 0, fontWeight: "bold" }}>
+                Room code: {roomCode}
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(roomCode!).then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    });
+                  }}
+                  style={{ marginLeft: 8, padding: "2px 8px", fontSize: 12 }}
+                >
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </p>
+              <p style={{ margin: "4px 0 0", fontSize: 12, color: "#666" }}>
+                Share this code with the other player.
+                Waiting for them to connect…
+              </p>
+            </div>
           </div>
         )}
       </section>
@@ -97,17 +81,21 @@ export function Lobby({ onBack, onJoinGame }: LobbyProps) {
         <h3 style={{ fontSize: 16 }}>Join match</h3>
         <input
           type="text"
-          placeholder="Match ID"
+          placeholder="Room code"
           value={joinId}
           onChange={(e) => setJoinId(e.target.value)}
           style={{ marginRight: 8, padding: "6px 8px" }}
         />
-        <button type="button" onClick={handleJoin} disabled={joining || !joinId.trim()}>
+        <button
+          type="button"
+          onClick={handleJoin}
+          disabled={joining || !joinId.trim()}
+        >
           {joining ? "Joining…" : "Join"}
         </button>
       </section>
 
-      {error && <p style={{ color: "#c00" }}>{error}</p>}
+      {connectionError && <p style={{ color: "#c00" }}>{connectionError}</p>}
     </div>
   );
 }

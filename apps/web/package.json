@@ -7,8 +7,8 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@stomp/stompjs": "^7.3.0",
     "framer-motion": "^11.0.0",
+    "peerjs": "^1.5.5",
     "preact": "^10.26.4"
   },
   "devDependencies": {

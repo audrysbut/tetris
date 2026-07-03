@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Home } from "./components/Home.tsx";
 import { SinglePlayerGame } from "./components/SinglePlayerGame.tsx";
 import { Lobby } from "./components/Lobby.tsx";
@@ -6,7 +6,7 @@ import { MultiplayerGame } from "./components/MultiplayerGame.tsx";
 import { BackButton } from "./components/BackButton.tsx";
 import { MusicMuteButton } from "./components/MusicMuteButton.tsx";
 import { startMusic, stopMusic } from "./game/music.ts";
-import type { JoinMatchResult } from "./api/match.ts";
+import { usePeerConnection } from "./game/usePeerConnection.ts";
 import { randomNatureImageUrl } from "./constants/picsumNatureIds.ts";
 
 type Screen = "home" | "single" | "lobby" | "multiplayer";
@@ -47,8 +47,25 @@ function SinglePlayerScreen({
 
 function App() {
   const [screen, setScreen] = useState<Screen>("home");
-  const [joinResult, setJoinResult] = useState<JoinMatchResult | null>(null);
   const [musicMuted, setMusicMuted] = useState(false);
+  const pc = usePeerConnection();
+  const connectedRef = useRef(false);
+
+  useEffect(() => {
+    if (pc.connected && !connectedRef.current && screen === "lobby") {
+      connectedRef.current = true;
+      setScreen("multiplayer");
+    }
+    if (!pc.connected) {
+      connectedRef.current = false;
+    }
+  }, [pc.connected, screen]);
+
+  const goHome = useCallback(() => {
+    pc.disconnect();
+    stopMusic();
+    setScreen("home");
+  }, [pc]);
 
   const toggleMute = useCallback(() => {
     if (!musicMuted) {
@@ -73,17 +90,13 @@ function App() {
     );
   }
 
-  if (screen === "multiplayer" && joinResult) {
+  if (screen === "multiplayer") {
     return (
       <>
         <MusicMuteButton muted={musicMuted} onToggle={toggleMute} />
         <MultiplayerGame
-          joinResult={joinResult}
-          onBack={() => {
-            stopMusic();
-            setScreen("home");
-            setJoinResult(null);
-          }}
+          peerConnection={pc}
+          onBack={goHome}
         />
       </>
     );
@@ -93,11 +106,8 @@ function App() {
     return (
       <>
         <MusicMuteButton muted={musicMuted} onToggle={toggleMute} />
-        <BackButton onClick={() => { stopMusic(); setScreen("home"); }} />
-        <Lobby
-          onBack={() => { stopMusic(); setScreen("home"); }}
-          onJoinGame={(result) => { setJoinResult(result); setScreen("multiplayer"); }}
-        />
+        <BackButton onClick={goHome} />
+        <Lobby peerConnection={pc} />
       </>
     );
   }
