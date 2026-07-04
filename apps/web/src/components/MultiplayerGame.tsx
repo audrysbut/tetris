@@ -10,7 +10,7 @@ import { BackButton } from "./BackButton.tsx";
 import { toGameState } from "../api/types.ts";
 import type { UsePeerConnectionReturn } from "../game/usePeerConnection.ts";
 import type { KeyAction } from "../game/useKeyboard.ts";
-import type { GameState } from "@shared/mod";
+import type { GameState } from "../shared/types.ts";
 
 interface MultiplayerGameProps {
   peerConnection: UsePeerConnectionReturn;

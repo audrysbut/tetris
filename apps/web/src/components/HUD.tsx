@@ -1,5 +1,5 @@
-import { getShape, CELL_COLORS } from "@shared/mod";
-import type { PieceType } from "@shared/mod";
+import { CELL_COLORS, getShape } from "../shared/pieces.ts";
+import type { PieceType } from "../shared/types.ts";
 import { Block } from "./Block.tsx";
 
 export interface HUDProps {

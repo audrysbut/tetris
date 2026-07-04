@@ -1,5 +1,5 @@
 import { useState, useEffect, type RefObject } from "react";
-import { BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../shared/types.ts";
 
 const MIN_CELL = 8;
 

@@ -1,5 +1,5 @@
-import { ghostPosition, BOARD_WIDTH, BOARD_HEIGHT } from "@shared/mod";
-import type { GameState } from "@shared/mod";
+import { ghostPosition } from "../shared/game.ts";
+import { BOARD_HEIGHT, BOARD_WIDTH, type GameState } from "../shared/types.ts";
 import {
   BoardCells,
   GhostPiece,

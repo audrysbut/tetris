@@ -1,8 +1,8 @@
-import { getShape, CELL_COLORS } from "@shared/mod";
-import type { Board, CurrentPiece } from "@shared/mod";
 import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Block } from "./Block.tsx";
+import type { Board, CurrentPiece } from "../shared/types.ts";
+import { CELL_COLORS, getShape } from "../shared/pieces.ts";
 
 const BORDER = 1;
 const MOVE_DURATION = 0.04;

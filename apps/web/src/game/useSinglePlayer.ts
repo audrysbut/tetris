@@ -1,14 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import {
-  createInitialState,
-  tick,
-  lockPiece,
-  finishLineClear,
-  applyAction,
-  DEFAULT_DROP_MS,
-  type GameState,
-  type GameAction,
-} from "@shared/mod";
+import { DEFAULT_DROP_MS } from "../shared/types.ts";
+import type { GameAction, GameState } from "../shared/types.ts";
+import { applyAction, createInitialState, finishLineClear, lockPiece, tick } from "../shared/game.ts";
+
 
 const LINE_CLEAR_ANIMATION_MS = 400;
 
