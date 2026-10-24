@@ -6,7 +6,8 @@
 ## Run locally
 
 ```bash
-deno task dev    # Vite dev server on :4200
+bun install     # Install dependencies
+bun run dev     # Vite dev server on :4200
 ```
 
 Open http://localhost:4200 → choose Single Player or Multiplayer.
@@ -14,7 +15,7 @@ Open http://localhost:4200 → choose Single Player or Multiplayer.
 ### Production build
 
 ```bash
-deno task build  # Outputs to apps/web/dist/
+bun run build   # Outputs to apps/web/dist/
 ```
 
 A `Dockerfile` is also available at `apps/web/` for containerized deployment (nginx serving the static build, port 80).

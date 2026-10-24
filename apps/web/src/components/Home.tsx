@@ -7,6 +7,7 @@ import {
   BUTTON_DPAD_DOWN,
   AXIS_LEFT_STICK_Y,
 } from "../game/gamepad.constants.ts";
+import pkg from "../../package.json";
 
 const AXIS_THRESHOLD = 0.5;
 
@@ -134,6 +135,7 @@ export function Home({ onSinglePlayer, onMultiplayer }: HomeProps) {
           Multiplayer (2P)
         </button>
       </div>
+      <p style={{ fontSize: 15, color: "#555", marginTop: 32 }}>v{pkg.version}</p>
     </main>
   );
 }

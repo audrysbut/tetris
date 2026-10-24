@@ -2,7 +2,7 @@
 
 ## Project structure
 
-Deno workspace monorepo (`deno.json` at root):
+Bun workspace monorepo (`package.json` at root):
 
 ```
 apps/web/     — Preact SPA (Vite, aliased as React via `preact/compat`)
@@ -12,11 +12,12 @@ apps/web/     — Preact SPA (Vite, aliased as React via `preact/compat`)
 ## Commands
 
 ```sh
-deno task dev    # Vite dev server on :4200 — single-player + P2P multiplayer
-deno task build  # Production build
+bun install     # Install dependencies
+bun run dev     # Vite dev server on :4200 — single-player + P2P multiplayer
+bun run build   # Production build
 ```
 
-- Web app builds via: `deno task --cwd apps/web build` (runs `node ./node_modules/vite/bin/vite.js build`)
+- Web app builds via: `bun run build` from root or `bun run --cwd apps/web build` (runs `vite build`)
 
 ## Key architecture notes
 
