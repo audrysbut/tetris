@@ -15,7 +15,7 @@ Open http://localhost:4200 → choose Single Player or Multiplayer.
 ### Production build
 
 ```bash
-bun run build   # Outputs to apps/web/dist/
+bun run build   # Outputs to dist/
 ```
 
-A `Dockerfile` is also available at `apps/web/` for containerized deployment (nginx serving the static build, port 80).
+A `Dockerfile` is also available at the root for containerized deployment (nginx serving the static build, port 80).

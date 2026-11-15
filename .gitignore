@@ -1,6 +1,6 @@
 node_modules/
-apps/web/.vite/
-apps/web/dist/
+.vite/
+dist/
 deno.lock
 .env
 .env.*

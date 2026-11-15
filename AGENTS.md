@@ -2,11 +2,11 @@
 
 ## Project structure
 
-Bun workspace monorepo (`package.json` at root):
+Single Preact SPA (Vite, `package.json` at root):
 
 ```
-apps/web/     — Preact SPA (Vite, aliased as React via `preact/compat`)
-  src/shared/ — Board types, piece logic, game engine
+src/          — Preact SPA (Vite, aliased as React via `preact/compat`)
+  shared/     — Board types, piece logic, game engine
 ```
 
 ## Commands
@@ -17,7 +17,7 @@ bun run dev     # Vite dev server on :4200 — single-player + P2P multiplayer
 bun run build   # Production build
 ```
 
-- Web app builds via: `bun run build` from root or `bun run --cwd apps/web build` (runs `vite build`)
+- Web app builds via: `bun run build` from root (runs `vite build`)
 
 ## Key architecture notes
 
@@ -25,8 +25,8 @@ bun run build   # Production build
 - **Matchmaking**: Host creates a room via `usePeerConnection().createRoom()` — a 6-character alphanumeric room code is generated and displayed. The guest joins by entering the code via `joinRoom(code)`. PeerJS handles signaling and NAT traversal automatically.
 - **Game state sync**: Each player runs the game engine **locally** for their own board (mirroring the single-player loop in `useSinglePlayer.ts`). After every action or gravity tick, each player sends their `PlayerStateUpdate` to the opponent over a WebRTC `DataChannel`. The opponent renders the received state on the adjacent board. Both peers are symmetric — no host advantage, no guest latency.
 - **Peer connection lifecycle**: Managed by `usePeerConnection.ts`. Exposes `send()` and `onData()` for bidirectional messaging. The `useMultiPlayer.ts` hook wraps the game loop + sync logic, consuming the peer connection.
-- **Gamepad button indices** are mapped in `apps/web/src/game/gamepad.constants.ts` using Xbox-style named constants (`BUTTON_A`, `BUTTON_RB`, `BUTTON_DPAD_LEFT`, etc.). Always import from this file; never use raw numeric indices.
-- **Input actions** are typed as `KeyAction` (`"left" | "right" | "rotate" | "softDrop" | "hardDrop" | "pause"`) in `apps/web/src/game/useKeyboard.ts` — both keyboard and gamepad hooks produce this same type.
+- **Gamepad button indices** are mapped in `src/game/gamepad.constants.ts` using Xbox-style named constants (`BUTTON_A`, `BUTTON_RB`, `BUTTON_DPAD_LEFT`, etc.). Always import from this file; never use raw numeric indices.
+- **Input actions** are typed as `KeyAction` (`"left" | "right" | "rotate" | "softDrop" | "hardDrop" | "pause"`) in `src/game/useKeyboard.ts` — both keyboard and gamepad hooks produce this same type.
 - **Web app uses Preact**, not React, via Vite aliases (`react` → `preact/compat`). Imports use `from "react"` etc. (Preact compat layer).
 - **No test framework, no CI workflows** — the build step is the only verification.
 
