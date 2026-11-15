@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Lobby } from "./Lobby.tsx";
 import { MultiplayerGame } from "./MultiplayerGame.tsx";
 import { BackButton } from "./BackButton.tsx";
@@ -20,6 +20,10 @@ export function MultiplayerScreen({
 }: MultiplayerScreenProps) {
   const [mpScreen, setMpScreen] = useState<"lobby" | "multiplayer">("lobby");
   const pc = usePeerConnection();
+  const backgroundImage = useMemo(
+    () => `url('${randomNatureImageUrl()}')`,
+    [],
+  );
   const connectedRef = useRef(false);
 
   useEffect(() => {
@@ -47,7 +51,7 @@ export function MultiplayerScreen({
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          backgroundImage: `url('${randomNatureImageUrl()}')`,
+          backgroundImage,
           backgroundSize: "cover",
           backgroundPosition: "center",
           color: "#eee",

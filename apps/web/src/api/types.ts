@@ -1,4 +1,4 @@
-import type { GameState } from "@shared/mod";
+import type { GameState } from "@shared/types";
 
 export interface PlayerStateUpdate {
   board: number[][];
@@ -19,5 +19,14 @@ export function toGameState(p: PlayerStateUpdate): GameState {
     lines: p.lines,
     gameOver: p.gameOver,
     level: p.level,
-  } as GameState;
+    pieceSeed: 0,
+    pieceIndex: 0,
+    clearingRows: undefined,
+  };
 }
+
+/** Messages exchanged between peers over the data channel. */
+export type PeerMessage =
+  | { type: "seed"; seed: number }
+  | { type: "sync"; playerId: number; state: PlayerStateUpdate }
+  | { type: "gameEnd"; winnerId: number };

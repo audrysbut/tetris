@@ -4,6 +4,7 @@ import {
   LINE_SCORES,
   type Board,
   type CurrentPiece,
+  type GameAction,
   type GameState,
   type PieceType,
   type Position,
@@ -87,7 +88,9 @@ export function mergePiece(board: Board, piece: CurrentPiece): Board {
 export function clearLines(board: Board): [Board, number] {
   const fullRows = getFullRows(board);
   if (fullRows.length === 0) return [cloneBoard(board), 0];
-  const newBoard = board.filter((_, y) => !fullRows.includes(y));
+  const newBoard = board
+    .filter((_, y) => !fullRows.includes(y))
+    .map((row) => [...row]);
   const emptyRows = fullRows.length;
   for (let i = 0; i < emptyRows; i++) {
     newBoard.unshift(Array.from({ length: BOARD_WIDTH }, () => 0));
@@ -151,6 +154,22 @@ export function createInitialState(seed?: number): GameState {
     pieceIndex: 2,
   };
   return returnState;
+}
+
+/** Create an empty (no piece) game state, useful for placeholder/opponent boards. */
+export function createEmptyGameState(): GameState {
+  return {
+    board: createEmptyBoard(),
+    currentPiece: null,
+    nextPieceType: 0,
+    score: 0,
+    lines: 0,
+    gameOver: false,
+    level: 1,
+    pieceSeed: 0,
+    pieceIndex: 0,
+    clearingRows: undefined,
+  };
 }
 
 /** Apply gravity: move piece down one row if possible; returns new state or null if locked */
@@ -220,6 +239,37 @@ export function rotate(state: GameState): GameState | null {
   return null;
 }
 
+/** Compute the next piece fields after a lock/spawn, given the board the new piece will spawn on. */
+function computeSpawn(
+  state: GameState,
+  board: Board,
+): {
+  currentPiece: CurrentPiece | null;
+  nextPieceType: PieceType;
+  pieceIndex: number;
+  gameOver: boolean;
+} {
+  const nextType = state.nextPieceType;
+  const spawnPos = spawnPosition(nextType);
+  const wouldCollide = wouldSpawnCollide(board, nextType);
+  const nextPieceType = wouldCollide
+    ? state.nextPieceType
+    : pieceAtSeed(state.pieceSeed, state.pieceIndex);
+  const nextIndex = wouldCollide ? state.pieceIndex : state.pieceIndex + 1;
+  return {
+    currentPiece: wouldCollide
+      ? null
+      : {
+          type: nextType,
+          rotation: 0,
+          position: spawnPos,
+        },
+    nextPieceType,
+    pieceIndex: nextIndex,
+    gameOver: wouldCollide,
+  };
+}
+
 /** Hard drop: move piece to bottom, then lock (may start line-clear animation). */
 export function hardDrop(state: GameState): GameState {
   if (state.gameOver || !state.currentPiece) return state;
@@ -241,24 +291,14 @@ export function lockPiece(state: GameState): GameState {
   const fullRows = getFullRows(board);
   if (fullRows.length === 0) {
     const [newBoard] = clearLines(board);
-    const nextType = state.nextPieceType;
-    const spawnPos = spawnPosition(nextType);
-    const wouldCollide = wouldSpawnCollide(newBoard, nextType);
-    const nextPiece = wouldCollide ? state.nextPieceType : pieceAtSeed(state.pieceSeed, state.pieceIndex);
-    const nextIndex = wouldCollide ? state.pieceIndex : state.pieceIndex + 1;
+    const spawned = computeSpawn(state, newBoard);
     return {
       ...state,
       board: newBoard,
-      currentPiece: wouldCollide
-        ? null
-        : {
-            type: nextType,
-            rotation: 0,
-            position: spawnPos,
-          },
-      nextPieceType: nextPiece,
-      pieceIndex: nextIndex,
-      gameOver: wouldCollide,
+      currentPiece: spawned.currentPiece,
+      nextPieceType: spawned.nextPieceType,
+      pieceIndex: spawned.pieceIndex,
+      gameOver: spawned.gameOver,
     };
   }
   return {
@@ -275,36 +315,25 @@ export function finishLineClear(state: GameState): GameState {
   if (!clearingRows?.length) return state;
   const [newBoard, linesCleared] = clearLines(state.board);
   const addScore = scoreForLines(linesCleared);
-  const nextType = state.nextPieceType;
-  const spawnPos = spawnPosition(nextType);
-  const wouldCollide = wouldSpawnCollide(newBoard, nextType);
-  const nextPiece = wouldCollide ? state.nextPieceType : pieceAtSeed(state.pieceSeed, state.pieceIndex);
-  const nextIndex = wouldCollide ? state.pieceIndex : state.pieceIndex + 1;
-  const newState: GameState = {
+  const spawned = computeSpawn(state, newBoard);
+  return {
     ...state,
     board: newBoard,
     score: state.score + addScore,
     lines: state.lines + linesCleared,
     level: Math.floor((state.lines + linesCleared) / 10) + 1,
     clearingRows: undefined,
-    currentPiece: wouldCollide
-      ? null
-      : {
-          type: nextType,
-          rotation: 0,
-          position: spawnPos,
-        },
-    nextPieceType: nextPiece,
-    pieceIndex: nextIndex,
-    gameOver: wouldCollide,
+    currentPiece: spawned.currentPiece,
+    nextPieceType: spawned.nextPieceType,
+    pieceIndex: spawned.pieceIndex,
+    gameOver: spawned.gameOver,
   };
-  return newState;
 }
 
 /** Apply one action (move/rotate/softDrop/hardDrop); returns new state or null if no change */
 export function applyAction(
   state: GameState,
-  action: { type: string; dir?: "left" | "right" | "down" }
+  action: GameAction
 ): GameState | null {
   if (state.gameOver) return null;
   switch (action.type) {

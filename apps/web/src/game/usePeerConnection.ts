@@ -117,7 +117,18 @@ export function usePeerConnection(): UsePeerConnectionReturn {
 
         connResolveRef.current = resolve;
 
+        let timeoutId: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+          reject(new Error("Connection timed out"));
+        }, 15000);
+        const clearTimer = () => {
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+        };
+
         peer.on("open", () => {
+          clearTimer();
           setPeerId(peer.id);
           const conn = peer.connect(code, { serialization: "json" });
           if (!conn) {
@@ -128,14 +139,11 @@ export function usePeerConnection(): UsePeerConnectionReturn {
         });
 
         peer.on("error", (err) => {
+          clearTimer();
           const msg = `${err.type}: ${err.message}`;
           setConnectionError(msg);
           reject(err);
         });
-
-        setTimeout(() => {
-          reject(new Error("Connection timed out"));
-        }, 15000);
       });
     },
     [cleanup, setupConnection]

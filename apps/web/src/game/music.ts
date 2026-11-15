@@ -1,9 +1,9 @@
+import { randomMusicUrl } from "../constants/soundhelixTracks.ts";
+
 /**
  * Background music when the game starts. Supports external MP3 URLs or YouTube links.
  * Call startMusic(url) from a user gesture (e.g. when entering single/multiplayer).
  */
-
-import { randomMusicUrl } from "../constants/soundhelixTracks.ts";
 
 // No single hardcoded default track: when startMusic() is called without a URL,
 // a random SoundHelix track is picked (see randomMusicUrl).

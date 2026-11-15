@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import type { PlayerStateUpdate } from "../api/types.ts";
+import { useMemo } from "react";
+import type { PeerMessage, PlayerStateUpdate } from "../api/types.ts";
 import { DEFAULT_DROP_MS, type GameAction, type GameState } from "../shared/types.ts";
 import { applyAction, createInitialState, finishLineClear, lockPiece, tick } from "../shared/game.ts";
 
@@ -68,13 +69,13 @@ export function useMultiPlayer({
 
   useEffect(() => {
     const unsub = onData((data: unknown) => {
-      const msg = data as Record<string, unknown>;
+      const msg = data as PeerMessage;
       if (msg.type === "seed") {
-        setMyState(createInitialState(msg.seed as number));
+        setMyState(createInitialState(msg.seed));
         setGameStatus("playing");
         startedRef.current = true;
       } else if (msg.type === "sync" && msg.playerId !== myPlayerId) {
-        setOppState(msg.state as PlayerStateUpdate);
+        setOppState(msg.state);
       } else if (msg.type === "gameEnd") {
         setGameStatus("finished");
         setWinnerId(myPlayerId);
@@ -153,12 +154,15 @@ export function useMultiPlayer({
     [myPlayerId, send]
   );
 
-  return {
-    myState,
-    oppState,
-    gameStatus,
-    winnerId,
-    myPlayerId,
-    dispatch,
-  };
+  return useMemo(
+    () => ({
+      myState,
+      oppState,
+      gameStatus,
+      winnerId,
+      myPlayerId,
+      dispatch,
+    }),
+    [myState, oppState, gameStatus, winnerId, myPlayerId, dispatch],
+  );
 }

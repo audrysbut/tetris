@@ -8,6 +8,7 @@ import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD } from "./HUD.tsx";
 import { BackButton } from "./BackButton.tsx";
 import { toGameState } from "../api/types.ts";
+import { createEmptyGameState } from "../shared/game.ts";
 import type { UsePeerConnectionReturn } from "../game/usePeerConnection.ts";
 import type { KeyAction } from "../game/useKeyboard.ts";
 import type { GameState } from "../shared/types.ts";
@@ -16,16 +17,6 @@ interface MultiplayerGameProps {
   peerConnection: UsePeerConnectionReturn;
   onBack: () => void;
 }
-
-const emptyState: GameState = {
-  board: Array.from({ length: 20 }, () => Array(10).fill(0)),
-  currentPiece: null,
-  nextPieceType: 0,
-  score: 0,
-  lines: 0,
-  gameOver: false,
-  level: 1,
-};
 
 export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps) {
   const { send, onData, isHost } = peerConnection;
@@ -68,7 +59,7 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
   const myGameState = multi.myState;
   const oppGameState: GameState = multi.oppState
     ? toGameState(multi.oppState)
-    : emptyState;
+    : createEmptyGameState();
 
   const showWaiting = multi.gameStatus === "waiting";
 
