@@ -3,12 +3,10 @@
  * Call startMusic(url) from a user gesture (e.g. when entering single/multiplayer).
  */
 
-/** Default track when startMusic() is called with no URL. Set to an MP3 or YouTube link, or leave empty for no default. */
-// export const DEFAULT_MUSIC_URL =
-//   "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+import { randomMusicUrl } from "../constants/soundhelixTracks.ts";
 
-const DEFAULT_MUSIC_URL =
-  "https://www.youtube.com/watch?v=A5WZZlTtILo&list=PLP6rFm3TTGwbY98voBz7YvGZJ_sbFFG3S&index=8";
+// No single hardcoded default track: when startMusic() is called without a URL,
+// a random SoundHelix track is picked (see randomMusicUrl).
 
 const YOUTUBE_REGEX =
   /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -119,7 +117,7 @@ function ensureYouTubeContainer(): void {
  */
 export function startMusic(url?: string): void {
   if (typeof document === "undefined") return;
-  const src = (url ?? DEFAULT_MUSIC_URL).trim();
+  const src = (url ?? randomMusicUrl()).trim();
   if (!src) return;
 
   const videoId = getYouTubeVideoId(src);
