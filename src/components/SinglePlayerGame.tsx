@@ -4,6 +4,7 @@ import { useGamepad } from "../game/useGamepad.ts";
 import { useScreenWakeLock } from "../game/useScreenWakeLock.ts";
 import { BoardCanvas } from "./BoardCanvas.tsx";
 import { HUD, NextPiece } from "./HUD.tsx";
+import { keyActionToGameAction } from "../game/inputActions.ts";
 import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect, useCallback, useRef, type ChangeEvent } from "react";
 import { useFitBoardCellSize } from "../game/useFitBoardCellSize.ts";
@@ -34,11 +35,8 @@ export function SinglePlayerGame() {
         return;
       }
       if (isPaused) return;
-      if (action === "left") dispatch({ type: "move", dir: "left" });
-      else if (action === "right") dispatch({ type: "move", dir: "right" });
-      else if (action === "rotate") dispatch({ type: "rotate" });
-      else if (action === "softDrop") dispatch({ type: "move", dir: "down" });
-      else if (action === "hardDrop") dispatch({ type: "hardDrop" });
+      const gameAction = keyActionToGameAction(action);
+      if (gameAction) dispatch(gameAction);
     },
     [dispatch, setPaused, isPaused]
   );

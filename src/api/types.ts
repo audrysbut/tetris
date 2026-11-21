@@ -1,5 +1,6 @@
 import type { GameState } from "@shared/types";
 
+/** Network snapshot of a player's visible game state. */
 export interface PlayerStateUpdate {
   board: number[][];
   currentPiece: GameState["currentPiece"];
@@ -22,6 +23,18 @@ export function toGameState(p: PlayerStateUpdate): GameState {
     pieceSeed: 0,
     pieceIndex: 0,
     clearingRows: undefined,
+  };
+}
+
+export function toPlayerStateUpdate(state: GameState): PlayerStateUpdate {
+  return {
+    board: state.board,
+    currentPiece: state.currentPiece,
+    nextPieceType: state.nextPieceType,
+    score: state.score,
+    lines: state.lines,
+    gameOver: state.gameOver,
+    level: state.level,
   };
 }
 

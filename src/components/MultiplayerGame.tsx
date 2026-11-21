@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, type RefObject } from "react";
 import { useFitBoardCellSize } from "../game/useFitBoardCellSize.ts";
 import { useMultiPlayer } from "../game/useMultiPlayer.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
@@ -9,6 +9,7 @@ import { HUD } from "./HUD.tsx";
 import { BackButton } from "./BackButton.tsx";
 import { toGameState } from "../api/types.ts";
 import { createEmptyGameState } from "../shared/game.ts";
+import { keyActionToGameAction } from "../game/inputActions.ts";
 import type { UsePeerConnectionReturn } from "../game/usePeerConnection.ts";
 import type { KeyAction } from "../game/useKeyboard.ts";
 import type { GameState } from "../shared/types.ts";
@@ -16,6 +17,60 @@ import type { GameState } from "../shared/types.ts";
 interface MultiplayerGameProps {
   peerConnection: UsePeerConnectionReturn;
   onBack: () => void;
+}
+
+interface PlayerColumnProps {
+  title: string;
+  state: GameState;
+  boardRef: RefObject<HTMLDivElement | null>;
+  cellSize: number;
+}
+
+function PlayerColumn({ title, state, boardRef, cellSize }: PlayerColumnProps) {
+  return (
+    <div
+      style={{
+        flex: "1 1 0",
+        minWidth: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          fontSize: 14,
+          flexShrink: 0,
+          color: "#fff",
+          textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000",
+        }}
+      >
+        {title}
+      </h3>
+      <HUD
+        score={state.score}
+        lines={state.lines}
+        level={state.level}
+        gameOver={state.gameOver}
+        isPaused={false}
+      />
+      <div
+        ref={boardRef}
+        style={{
+          flex: 1,
+          minHeight: 0,
+          alignSelf: "stretch",
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
+      >
+        <BoardCanvas state={state} cellSize={cellSize} />
+      </div>
+    </div>
+  );
 }
 
 export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps) {
@@ -39,11 +94,8 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
   const handleAction = useCallback(
     (action: KeyAction) => {
       if (multi.gameStatus !== "playing") return;
-      if (action === "left") multi.dispatch({ type: "move", dir: "left" });
-      else if (action === "right") multi.dispatch({ type: "move", dir: "right" });
-      else if (action === "rotate") multi.dispatch({ type: "rotate" });
-      else if (action === "softDrop") multi.dispatch({ type: "move", dir: "down" });
-      else if (action === "hardDrop") multi.dispatch({ type: "hardDrop" });
+      const gameAction = keyActionToGameAction(action);
+      if (gameAction) multi.dispatch(gameAction);
     },
     [multi]
   );
@@ -102,72 +154,18 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
               alignSelf: "stretch",
             }}
           >
-            <div
-              style={{
-                flex: "1 1 0",
-                minWidth: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              <h3 style={{ margin: 0, fontSize: 14, flexShrink: 0, color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000" }}>
-                You (Player {multi.myPlayerId})
-              </h3>
-              <HUD
-                score={myGameState.score}
-                lines={myGameState.lines}
-                level={myGameState.level}
-                gameOver={myGameState.gameOver}
-                isPaused={false}
-              />
-              <div
-                ref={myBoardRef}
-                style={{
-                  flex: 1,
-                  minHeight: 0,
-                  alignSelf: "stretch",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                <BoardCanvas state={myGameState} cellSize={myCellSize} />
-              </div>
-            </div>
-            <div
-              style={{
-                flex: "1 1 0",
-                minWidth: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              <h3 style={{ margin: 0, fontSize: 14, flexShrink: 0, color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 6px #000" }}>Opponent</h3>
-              <HUD
-                score={oppGameState.score}
-                lines={oppGameState.lines}
-                level={oppGameState.level}
-                gameOver={oppGameState.gameOver}
-                isPaused={false}
-              />
-              <div
-                ref={oppBoardRef}
-                style={{
-                  flex: 1,
-                  minHeight: 0,
-                  alignSelf: "stretch",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                <BoardCanvas state={oppGameState} cellSize={oppCellSize} />
-              </div>
-            </div>
+            <PlayerColumn
+              title={`You (Player ${multi.myPlayerId})`}
+              state={myGameState}
+              boardRef={myBoardRef}
+              cellSize={myCellSize}
+            />
+            <PlayerColumn
+              title="Opponent"
+              state={oppGameState}
+              boardRef={oppBoardRef}
+              cellSize={oppCellSize}
+            />
           </div>
           {multi.gameStatus === "finished" && multi.winnerId != null && (
             <p style={{ marginTop: 8, fontSize: 16, fontWeight: "bold" }}>

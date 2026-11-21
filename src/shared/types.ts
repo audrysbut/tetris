@@ -57,3 +57,11 @@ export const LINE_SCORES = [0, 100, 300, 500, 800] as const;
 
 /** Default drop interval in ms (will decrease with level) */
 export const DEFAULT_DROP_MS = 1000;
+
+/** Duration of line-clear animation before rows collapse and next piece spawns. */
+export const LINE_CLEAR_ANIMATION_MS = 400;
+
+export function getDropIntervalMs(level: number, constantSpeed = false): number {
+  if (constantSpeed) return DEFAULT_DROP_MS;
+  return Math.max(100, DEFAULT_DROP_MS - (level - 1) * 50);
+}

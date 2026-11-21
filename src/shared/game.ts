@@ -190,6 +190,18 @@ export function tick(state: GameState): GameState | null {
   };
 }
 
+export interface GravityStep {
+  state: GameState;
+  locked: boolean;
+}
+
+/** Advance gravity by one row, locking the piece when it cannot move down. */
+export function stepGravity(state: GameState): GravityStep {
+  const next = tick(state);
+  if (next) return { state: next, locked: false };
+  return { state: lockPiece(state), locked: true };
+}
+
 /** Move piece left/right/down; returns new state or null if invalid */
 export function move(
   state: GameState,
@@ -348,4 +360,35 @@ export function applyAction(
     default:
       return null;
   }
+}
+
+export interface ReducedAction {
+  state: GameState;
+  changed: boolean;
+  sound: "rotate" | "drop" | null;
+}
+
+/** Apply a player action, including soft-drop lock when moving down into an occupied cell. */
+export function reduceGameAction(state: GameState, action: GameAction): ReducedAction {
+  if (state.gameOver || state.clearingRows?.length) {
+    return { state, changed: false, sound: null };
+  }
+
+  const next = applyAction(state, action);
+  if (next) {
+    const sound =
+      action.type === "rotate"
+        ? "rotate"
+        : action.type === "hardDrop"
+          ? "drop"
+          : null;
+    return { state: next, changed: true, sound };
+  }
+
+  if (action.type === "softDrop" || (action.type === "move" && action.dir === "down")) {
+    const locked = lockPiece(state);
+    return { state: locked, changed: true, sound: "drop" };
+  }
+
+  return { state, changed: false, sound: null };
 }

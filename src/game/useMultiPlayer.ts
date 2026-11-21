@@ -1,11 +1,19 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-import { useMemo } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import type { PeerMessage, PlayerStateUpdate } from "../api/types.ts";
-import { DEFAULT_DROP_MS, type GameAction, type GameState } from "../shared/types.ts";
-import { applyAction, createInitialState, finishLineClear, lockPiece, tick } from "../shared/game.ts";
+import { toPlayerStateUpdate } from "../api/types.ts";
+import {
+  LINE_CLEAR_ANIMATION_MS,
+  getDropIntervalMs,
+  type GameAction,
+  type GameState,
+} from "../shared/types.ts";
+import {
+  createInitialState,
+  finishLineClear,
+  reduceGameAction,
+  stepGravity,
+} from "../shared/game.ts";
 import { playDrop, playLineClear, playRotate, preloadLineClear } from "./sfx.ts";
-
-const LINE_CLEAR_ANIMATION_MS = 400;
 
 export interface UseMultiPlayerOptions {
   send: (data: unknown) => void;
@@ -21,18 +29,6 @@ export interface UseMultiPlayerReturn {
   winnerId: number | null;
   myPlayerId: 1 | 2;
   dispatch: (action: GameAction) => void;
-}
-
-function serializeState(state: GameState): PlayerStateUpdate {
-  return {
-    board: state.board,
-    currentPiece: state.currentPiece,
-    nextPieceType: state.nextPieceType,
-    score: state.score,
-    lines: state.lines,
-    gameOver: state.gameOver,
-    level: state.level,
-  };
 }
 
 export function useMultiPlayer({
@@ -96,7 +92,7 @@ export function useMultiPlayer({
     const id = window.setTimeout(() => {
       setMyState((s) => {
         const next = finishLineClear(s);
-        send({ type: "sync", playerId: myPlayerId, state: serializeState(next) });
+        send({ type: "sync", playerId: myPlayerId, state: toPlayerStateUpdate(next) });
         return next;
       });
     }, LINE_CLEAR_ANIMATION_MS);
@@ -111,18 +107,17 @@ export function useMultiPlayer({
       }
       return;
     }
-    const ms = Math.max(100, DEFAULT_DROP_MS - (myState.level - 1) * 50);
+    const ms = getDropIntervalMs(myState.level);
     intervalRef.current = setInterval(() => {
       setMyState((s) => {
-        const next = tick(s);
-        if (next) {
-          send({ type: "sync", playerId: myPlayerId, state: serializeState(next) });
-          return next;
-        }
-        const locked = lockPiece(s);
-        playDrop();
-        send({ type: "sync", playerId: myPlayerId, state: serializeState(locked) });
-        return locked;
+        const step = stepGravity(s);
+        if (step.locked) playDrop();
+        send({
+          type: "sync",
+          playerId: myPlayerId,
+          state: toPlayerStateUpdate(step.state),
+        });
+        return step.state;
       });
     }, ms);
     return () => {
@@ -142,23 +137,18 @@ export function useMultiPlayer({
   const dispatch = useCallback(
     (action: GameAction) => {
       setMyState((s) => {
-        if (s.gameOver) return s;
-        if (s.clearingRows?.length) return s;
         if (gameStatusRef.current !== "playing") return s;
-        const next = applyAction(s, action);
-        if (next) {
-          if (action.type === "rotate") playRotate();
-          if (action.type === "hardDrop") playDrop();
-          send({ type: "sync", playerId: myPlayerId, state: serializeState(next) });
-          return next;
+        const result = reduceGameAction(s, action);
+        if (result.sound === "rotate") playRotate();
+        if (result.sound === "drop") playDrop();
+        if (result.changed) {
+          send({
+            type: "sync",
+            playerId: myPlayerId,
+            state: toPlayerStateUpdate(result.state),
+          });
         }
-        if (action.type === "move" && action.dir === "down") {
-          const locked = lockPiece(s);
-          playDrop();
-          send({ type: "sync", playerId: myPlayerId, state: serializeState(locked) });
-          return locked;
-        }
-        return s;
+        return result.state;
       });
     },
     [myPlayerId, send]

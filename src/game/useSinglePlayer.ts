@@ -1,11 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { DEFAULT_DROP_MS } from "../shared/types.ts";
+import { LINE_CLEAR_ANIMATION_MS, getDropIntervalMs } from "../shared/types.ts";
 import type { GameAction, GameState } from "../shared/types.ts";
-import { applyAction, createInitialState, finishLineClear, lockPiece, tick } from "../shared/game.ts";
+import {
+  createInitialState,
+  finishLineClear,
+  reduceGameAction,
+  stepGravity,
+} from "../shared/game.ts";
 import { playDrop, playLineClear, playRotate, preloadLineClear } from "./sfx.ts";
-
-
-const LINE_CLEAR_ANIMATION_MS = 400;
 
 export function useSinglePlayer(constantSpeed = false) {
   const [state, setState] = useState<GameState>(() => createInitialState());
@@ -41,16 +43,12 @@ export function useSinglePlayer(constantSpeed = false) {
       }
       return;
     }
-    const ms = constantSpeed
-      ? DEFAULT_DROP_MS
-      : Math.max(100, DEFAULT_DROP_MS - (state.level - 1) * 50);
+    const ms = getDropIntervalMs(state.level, constantSpeed);
     intervalRef.current = setInterval(() => {
       setState((s) => {
-        const next = tick(s);
-        if (next) return next;
-        const locked = lockPiece(s);
-        playDrop();
-        return locked;
+        const step = stepGravity(s);
+        if (step.locked) playDrop();
+        return step.state;
       });
     }, ms);
     return () => {
@@ -60,20 +58,10 @@ export function useSinglePlayer(constantSpeed = false) {
 
   const dispatch = useCallback((action: GameAction) => {
     setState((s) => {
-      if (s.gameOver) return s;
-      if (s.clearingRows?.length) return s; // no-op during line-clear animation
-      const next = applyAction(s, action);
-      if (next) {
-        if (action.type === "rotate") playRotate();
-        if (action.type === "hardDrop") playDrop();
-        return next;
-      }
-      if (action.type === "move" && action.dir === "down") {
-        const locked = lockPiece(s);
-        playDrop();
-        return locked;
-      }
-      return s;
+      const result = reduceGameAction(s, action);
+      if (result.sound === "rotate") playRotate();
+      if (result.sound === "drop") playDrop();
+      return result.state;
     });
   }, []);
 
