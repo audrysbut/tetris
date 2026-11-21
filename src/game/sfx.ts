@@ -115,13 +115,11 @@ export function preloadLineClear(): void {
 
 export function playLineClear(lines: number): void {
   if (muted) return;
+  const count = Math.max(1, Math.min(4, lines || 1));
   void ensureLineClearBuffer().then((buf) => {
     if (!buf) return;
-    playBoosted(buf, 0.6);
-    if (lines >= 4) {
-      window.setTimeout(() => {
-        void ensureLineClearBuffer().then((b) => b && playBoosted(b, 0.6));
-      }, 120);
+    for (let i = 0; i < count; i++) {
+      window.setTimeout(() => playBoosted(buf, 0.6), i * 50);
     }
   });
   // (No fallback: boosted playback above is the only path.)
