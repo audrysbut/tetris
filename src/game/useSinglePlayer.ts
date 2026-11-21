@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { DEFAULT_DROP_MS } from "../shared/types.ts";
 import type { GameAction, GameState } from "../shared/types.ts";
 import { applyAction, createInitialState, finishLineClear, lockPiece, tick } from "../shared/game.ts";
+import { playDrop, playLineClear, playRotate, preloadLineClear } from "./sfx.ts";
 
 
 const LINE_CLEAR_ANIMATION_MS = 400;
@@ -10,6 +11,10 @@ export function useSinglePlayer(constantSpeed = false) {
   const [state, setState] = useState<GameState>(() => createInitialState());
   const [isPaused, setPaused] = useState(false);
   const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    preloadLineClear();
+  }, []);
 
   const reset = useCallback(() => {
     setState(createInitialState());
@@ -20,6 +25,7 @@ export function useSinglePlayer(constantSpeed = false) {
   useEffect(() => {
     const clearing = state.clearingRows?.length;
     if (!clearing) return;
+    playLineClear(clearing);
     const id = window.setTimeout(() => {
       setState((s) => finishLineClear(s));
     }, LINE_CLEAR_ANIMATION_MS);
@@ -42,7 +48,9 @@ export function useSinglePlayer(constantSpeed = false) {
       setState((s) => {
         const next = tick(s);
         if (next) return next;
-        return lockPiece(s);
+        const locked = lockPiece(s);
+        playDrop();
+        return locked;
       });
     }, ms);
     return () => {
@@ -55,9 +63,14 @@ export function useSinglePlayer(constantSpeed = false) {
       if (s.gameOver) return s;
       if (s.clearingRows?.length) return s; // no-op during line-clear animation
       const next = applyAction(s, action);
-      if (next) return next;
+      if (next) {
+        if (action.type === "rotate") playRotate();
+        if (action.type === "hardDrop") playDrop();
+        return next;
+      }
       if (action.type === "move" && action.dir === "down") {
         const locked = lockPiece(s);
+        playDrop();
         return locked;
       }
       return s;

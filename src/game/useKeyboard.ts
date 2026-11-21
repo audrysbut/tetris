@@ -15,6 +15,7 @@ const KEY_MAP: Record<string, KeyAction> = {
   ArrowDown: "softDrop",
   Space: "hardDrop",
   KeyP: "pause",
+  Enter: "pause",
 };
 
 const KEY_REPEAT_MS = 130;

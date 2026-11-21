@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import type { PeerMessage, PlayerStateUpdate } from "../api/types.ts";
 import { DEFAULT_DROP_MS, type GameAction, type GameState } from "../shared/types.ts";
 import { applyAction, createInitialState, finishLineClear, lockPiece, tick } from "../shared/game.ts";
+import { playDrop, playLineClear, playRotate, preloadLineClear } from "./sfx.ts";
 
 const LINE_CLEAR_ANIMATION_MS = 400;
 
@@ -51,6 +52,10 @@ export function useMultiPlayer({
   gameStatusRef.current = gameStatus;
 
   useEffect(() => {
+    preloadLineClear();
+  }, []);
+
+  useEffect(() => {
     if (!connected) {
       setGameStatus("connecting");
       startedRef.current = false;
@@ -87,6 +92,7 @@ export function useMultiPlayer({
   useEffect(() => {
     const clearing = myState.clearingRows?.length;
     if (!clearing) return;
+    playLineClear(clearing);
     const id = window.setTimeout(() => {
       setMyState((s) => {
         const next = finishLineClear(s);
@@ -114,6 +120,7 @@ export function useMultiPlayer({
           return next;
         }
         const locked = lockPiece(s);
+        playDrop();
         send({ type: "sync", playerId: myPlayerId, state: serializeState(locked) });
         return locked;
       });
@@ -140,11 +147,14 @@ export function useMultiPlayer({
         if (gameStatusRef.current !== "playing") return s;
         const next = applyAction(s, action);
         if (next) {
+          if (action.type === "rotate") playRotate();
+          if (action.type === "hardDrop") playDrop();
           send({ type: "sync", playerId: myPlayerId, state: serializeState(next) });
           return next;
         }
         if (action.type === "move" && action.dir === "down") {
           const locked = lockPiece(s);
+          playDrop();
           send({ type: "sync", playerId: myPlayerId, state: serializeState(locked) });
           return locked;
         }

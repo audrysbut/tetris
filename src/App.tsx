@@ -4,6 +4,7 @@ import { SinglePlayerScreen } from "./components/SinglePlayerScreen.tsx";
 import { MultiplayerScreen } from "./components/MultiplayerScreen.tsx";
 import { MusicMuteButton } from "./components/MusicMuteButton.tsx";
 import { startMusic, stopMusic } from "./game/music.ts";
+import { setSfxMuted } from "./game/sfx.ts";
 
 type Screen = "home" | "single" | "multiplayer";
 
@@ -15,8 +16,10 @@ function App() {
     if (!musicMuted) {
       stopMusic();
       setMusicMuted(true);
+      setSfxMuted(true);
     } else {
       setMusicMuted(false);
+      setSfxMuted(false);
       if (screen !== "home") startMusic();
     }
   }, [musicMuted, screen]);
