@@ -1,7 +1,7 @@
 # Tetris: Single-Player and 2P Multiplayer
 
 - **Single player:** Play in the browser (no server required).
-- **Multiplayer:** 2 players via **P2P WebRTC** (PeerJS). No server needed — the host creates a room, the guest joins with a 6-character code. Each player runs their own game engine locally and syncs state over a direct peer-to-peer data channel.
+- **Multiplayer:** 2 players via **P2P WebRTC** (PeerJS). No server needed — the host creates a room and shares a join link or QR code. The guest opens the link to join automatically. Each player runs their own game engine locally and syncs state over a direct peer-to-peer data channel.
 
 ## Run locally
 

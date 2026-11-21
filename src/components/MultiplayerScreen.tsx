@@ -11,12 +11,14 @@ interface MultiplayerScreenProps {
   onBack: () => void;
   musicMuted: boolean;
   onToggleMute: () => void;
+  initialJoinCode?: string;
 }
 
 export function MultiplayerScreen({
   onBack,
   musicMuted,
   onToggleMute,
+  initialJoinCode,
 }: MultiplayerScreenProps) {
   const [mpScreen, setMpScreen] = useState<"lobby" | "multiplayer">("lobby");
   const pc = usePeerConnection();
@@ -67,7 +69,7 @@ export function MultiplayerScreen({
     <>
       <MusicMuteButton muted={musicMuted} onToggle={onToggleMute} />
       <BackButton onClick={goHome} />
-      <Lobby peerConnection={pc} />
+      <Lobby peerConnection={pc} initialJoinCode={initialJoinCode} />
     </>
   );
 }

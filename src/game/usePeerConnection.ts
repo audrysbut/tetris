@@ -11,6 +11,13 @@ function generateRoomCode(): string {
   return code;
 }
 
+const PEER_CONFIG: RTCConfiguration = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+  ],
+};
+
 export interface UsePeerConnectionReturn {
   peerId: string | null;
   connected: boolean;
@@ -86,7 +93,7 @@ export function usePeerConnection(): UsePeerConnectionReturn {
     cleanup();
     const code = generateRoomCode();
     return new Promise<string>((resolve, reject) => {
-      const peer = new Peer(code);
+      const peer = new Peer(code, { config: PEER_CONFIG });
       peerRef.current = peer;
 
       peer.on("open", () => {
@@ -112,7 +119,7 @@ export function usePeerConnection(): UsePeerConnectionReturn {
     async (code: string) => {
       cleanup();
       return new Promise<void>((resolve, reject) => {
-        const peer = new Peer();
+        const peer = new Peer({ config: PEER_CONFIG });
         peerRef.current = peer;
 
         connResolveRef.current = resolve;

@@ -22,7 +22,7 @@ bun run build   # Production build
 ## Key architecture notes
 
 - **Multiplayer is P2P via WebRTC** — no server, no RabbitMQ. Uses `PeerJS` (v1.x) with the free cloud signaling server at `0.peerjs.com`. No infrastructure needed.
-- **Matchmaking**: Host creates a room via `usePeerConnection().createRoom()` — a 6-character alphanumeric room code is generated and displayed. The guest joins by entering the code via `joinRoom(code)`. PeerJS handles signaling and NAT traversal automatically.
+- **Matchmaking**: Host creates a room via `usePeerConnection().createRoom()` — a 6-character alphanumeric room code is generated and displayed as a shareable join URL (`?join=CODE`) and QR code. The guest opens the link to auto-join via `joinRoom(code)`. PeerJS handles signaling and NAT traversal automatically.
 - **Game state sync**: Each player runs the game engine **locally** for their own board (mirroring the single-player loop in `useSinglePlayer.ts`). After every action or gravity tick, each player sends their `PlayerStateUpdate` to the opponent over a WebRTC `DataChannel`. The opponent renders the received state on the adjacent board. Both peers are symmetric — no host advantage, no guest latency.
 - **Peer connection lifecycle**: Managed by `usePeerConnection.ts`. Exposes `send()` and `onData()` for bidirectional messaging. The `useMultiPlayer.ts` hook wraps the game loop + sync logic, consuming the peer connection.
 - **Gamepad button indices** are mapped in `src/game/gamepad.constants.ts` using Xbox-style named constants (`BUTTON_A`, `BUTTON_RB`, `BUTTON_DPAD_LEFT`, etc.). Always import from this file; never use raw numeric indices.
