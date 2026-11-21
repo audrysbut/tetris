@@ -1,0 +1,10 @@
+- generic [ref=e2]:
+  - button "Mute" [ref=e3] [cursor=pointer]
+  - main [ref=e4]:
+    - heading "Tetris" [level=1] [ref=e5]
+    - paragraph [ref=e6]: Single player or 2P multiplayer
+    - paragraph [ref=e7]: ↑↓ or D-pad to select, Enter/Space or A to confirm
+    - generic [ref=e8]:
+      - button "Single player" [ref=e9]
+      - button "Multiplayer (2P)" [ref=e10]
+    - paragraph [ref=e11]: v1.0.0

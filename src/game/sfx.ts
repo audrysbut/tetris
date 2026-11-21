@@ -6,11 +6,13 @@
  * with a gain boost (>1) so it can be played louder than the HTMLAudio cap.
  */
 
+const BASE = import.meta.env.BASE_URL;
+
 // rotate/drop are intentionally swapped per user request.
 const SOUND_URLS = {
-  rotate: "/sounds/drop.ogg",
-  drop: "/sounds/rotate.ogg",
-  lineClear: "/sounds/lineclear.ogg",
+  rotate: `${BASE}sounds/drop.ogg`,
+  drop: `${BASE}sounds/rotate.ogg`,
+  lineClear: `${BASE}sounds/lineclear.ogg`,
 } as const;
 
 const audioCache: Partial<Record<"rotate" | "drop", HTMLAudioElement>> = {};
