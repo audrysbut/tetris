@@ -8,7 +8,7 @@ const BORDER = 1;
 const MOVE_DURATION = 0.04;
 const ROTATE_DURATION = 0.08;
 
-export interface BoardCellsProps {
+interface BoardCellsProps {
   board: Board;
   cellSize: number;
   /** Row indices currently animating (line clear). */
@@ -73,7 +73,7 @@ export function BoardCells({
   );
 }
 
-export interface GhostPieceProps {
+interface GhostPieceProps {
   ghost: CurrentPiece;
   cellSize: number;
 }
@@ -114,7 +114,7 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
   );
 }
 
-export interface CurrentPieceViewProps {
+interface CurrentPieceViewProps {
   piece: CurrentPiece;
   effectiveY: number;
   cellSize: number;

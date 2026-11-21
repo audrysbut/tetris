@@ -6,23 +6,19 @@
  * with a gain boost (>1) so it can be played louder than the HTMLAudio cap.
  */
 
+// rotate/drop are intentionally swapped per user request.
 const SOUND_URLS = {
-  rotate: "/sounds/rotate.ogg",
-  drop: "/sounds/drop.ogg",
+  rotate: "/sounds/drop.ogg",
+  drop: "/sounds/rotate.ogg",
   lineClear: "/sounds/lineclear.ogg",
 } as const;
-
-// Swapped per user request:
-const ROTATE_URL = "/sounds/drop.ogg";
-const DROP_URL = "/sounds/rotate.ogg";
 
 const audioCache: Partial<Record<"rotate" | "drop", HTMLAudioElement>> = {};
 
 function getAudio(key: "rotate" | "drop"): HTMLAudioElement | null {
   if (typeof window === "undefined") return null;
   if (!audioCache[key]) {
-    const url = key === "rotate" ? ROTATE_URL : DROP_URL;
-    const a = new Audio(url);
+    const a = new Audio(SOUND_URLS[key]);
     a.preload = "auto";
     audioCache[key] = a;
   }

@@ -1,4 +1,4 @@
-export interface BlockProps {
+interface BlockProps {
   x: number;
   y: number;
   width: number;

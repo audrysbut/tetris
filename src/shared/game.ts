@@ -29,7 +29,7 @@ function cloneBoard(board: Board): Board {
 }
 
 /** Check if a piece at position overlaps with board or is out of bounds */
-export function collides(
+function collides(
   board: Board,
   piece: CurrentPiece,
   offset: Position = { x: 0, y: 0 }
@@ -66,7 +66,7 @@ export function ghostPosition(board: Board, piece: CurrentPiece): CurrentPiece {
 }
 
 /** Merge current piece into board and return new board (does not mutate) */
-export function mergePiece(board: Board, piece: CurrentPiece): Board {
+function mergePiece(board: Board, piece: CurrentPiece): Board {
   const next = cloneBoard(board);
   const shape = getShape(piece.type, piece.rotation);
   const color = piece.type + 1; // 1-7 for display
@@ -85,7 +85,7 @@ export function mergePiece(board: Board, piece: CurrentPiece): Board {
 }
 
 /** Find and clear full rows; return [newBoard, numberOfLinesCleared] */
-export function clearLines(board: Board): [Board, number] {
+function clearLines(board: Board): [Board, number] {
   const fullRows = getFullRows(board);
   if (fullRows.length === 0) return [cloneBoard(board), 0];
   const newBoard = board
@@ -99,7 +99,7 @@ export function clearLines(board: Board): [Board, number] {
 }
 
 /** Return row indices that are full (all cells non-zero) */
-export function getFullRows(board: Board): number[] {
+function getFullRows(board: Board): number[] {
   const fullRows: number[] = [];
   for (let y = 0; y < board.length; y++) {
     if (board[y].every((cell) => cell !== 0)) fullRows.push(y);
@@ -108,12 +108,12 @@ export function getFullRows(board: Board): number[] {
 }
 
 /** Score for clearing n lines (1-4) */
-export function scoreForLines(lines: number): number {
+function scoreForLines(lines: number): number {
   return LINE_SCORES[Math.min(lines, 4)] ?? 0;
 }
 
 /** Spawn position: center top (y may be negative for I piece) */
-export function spawnPosition(pieceType: PieceType): Position {
+function spawnPosition(pieceType: PieceType): Position {
   const shape = getShape(pieceType, 0);
   const cols = shape[0].length;
   const x = Math.floor((BOARD_WIDTH - cols) / 2);
@@ -122,7 +122,7 @@ export function spawnPosition(pieceType: PieceType): Position {
 }
 
 /** Check if piece at spawn position collides (top-out / game over) */
-export function wouldSpawnCollide(board: Board, pieceType: PieceType): boolean {
+function wouldSpawnCollide(board: Board, pieceType: PieceType): boolean {
   const pos = spawnPosition(pieceType);
   const piece: CurrentPiece = {
     type: pieceType,

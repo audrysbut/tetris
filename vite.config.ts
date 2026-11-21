@@ -32,4 +32,7 @@ export default defineConfig(({ command }) => ({
   optimizeDeps: {
     include: ["preact/jsx-runtime", "preact", "preact/compat"],
   },
+  test: {
+    environment: "node",
+  },
 }));

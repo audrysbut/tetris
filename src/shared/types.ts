@@ -3,7 +3,7 @@ export const BOARD_WIDTH = 10;
 export const BOARD_HEIGHT = 20;
 
 /** Cell value: 0 = empty, 1-7 = piece color/index */
-export type CellValue = number;
+type CellValue = number;
 
 /** Row of cells */
 export type Row = CellValue[];

@@ -2,7 +2,7 @@ import { CELL_COLORS, getShape } from "../shared/pieces.ts";
 import type { PieceType } from "../shared/types.ts";
 import { Block } from "./Block.tsx";
 
-export interface HUDProps {
+interface HUDProps {
   score: number;
   lines: number;
   level: number;
