@@ -40,9 +40,10 @@ export function useGamepad(
 
   const prevRef = useRef({
     buttons: Array(20).fill(false) as boolean[],
-    axisLeftRight: 0,
-    axisDown: 0,
-    axisUp: 0,
+    left: false,
+    right: false,
+    down: false,
+    up: false,
   });
   const repeatRef = useRef({
     lastLeft: 0,
@@ -71,27 +72,44 @@ export function useGamepad(
     const axis6 = axes[AXIS_DPAD_X] ?? 0;
     const axis7 = axes[AXIS_DPAD_Y] ?? 0;
 
+    const dpadLeft = !!buttons[BUTTON_DPAD_LEFT];
+    const dpadRight = !!buttons[BUTTON_DPAD_RIGHT];
+    const dpadDown = !!buttons[BUTTON_DPAD_DOWN];
+    const dpadUp = !!buttons[BUTTON_DPAD_UP];
+
+    // D-pad button release can be reported a frame before the hat/axis reports neutral.
+    // Suppress the lingering D-pad axis on that release frame so we detect release cleanly.
+    const dpadLeftReleased = !!prev.buttons[BUTTON_DPAD_LEFT] && !dpadLeft;
+    const dpadRightReleased = !!prev.buttons[BUTTON_DPAD_RIGHT] && !dpadRight;
+    const dpadDownReleased = !!prev.buttons[BUTTON_DPAD_DOWN] && !dpadDown;
+    const dpadUpReleased = !!prev.buttons[BUTTON_DPAD_UP] && !dpadUp;
+
     const left =
-      !!buttons[BUTTON_DPAD_LEFT] || (axis0 < -AXIS_DEAD_ZONE && axis0 <= -AXIS_THRESHOLD) ||
-      (axis6 < -AXIS_THRESHOLD);
+      dpadLeft ||
+      (axis0 < -AXIS_DEAD_ZONE && axis0 <= -AXIS_THRESHOLD) ||
+      (axis6 < -AXIS_THRESHOLD && !dpadLeftReleased);
     const right =
-      !!buttons[BUTTON_DPAD_RIGHT] || (axis0 > AXIS_DEAD_ZONE && axis0 >= AXIS_THRESHOLD) ||
-      (axis6 > AXIS_THRESHOLD);
+      dpadRight ||
+      (axis0 > AXIS_DEAD_ZONE && axis0 >= AXIS_THRESHOLD) ||
+      (axis6 > AXIS_THRESHOLD && !dpadRightReleased);
     const down =
-      !!buttons[BUTTON_DPAD_DOWN] ||
+      dpadDown ||
       (axis1 > AXIS_DEAD_ZONE && axis1 >= AXIS_THRESHOLD) ||
-      (axis7 > AXIS_THRESHOLD);
-    const rotate = !!buttons[BUTTON_A] || !!buttons[BUTTON_B] || !!buttons[BUTTON_X];
-    const hardDrop = !!buttons[BUTTON_Y] || !!buttons[BUTTON_RB] || !!buttons[BUTTON_DPAD_UP] ||
+      (axis7 > AXIS_THRESHOLD && !dpadDownReleased);
+    const up =
+      dpadUp ||
       (axis7 < -AXIS_DEAD_ZONE && axis7 <= -AXIS_THRESHOLD) ||
-      (axis1 < -AXIS_THRESHOLD);
+      (axis1 < -AXIS_THRESHOLD && !dpadUpReleased);
+
+    const rotate = !!buttons[BUTTON_A] || !!buttons[BUTTON_B] || !!buttons[BUTTON_X];
+    const hardDrop = !!buttons[BUTTON_Y] || !!buttons[BUTTON_RB] || up;
     const pause = !!buttons[BUTTON_START];
 
     const fire = (action: KeyAction) => onActionRef.current(action);
 
-    const wasLeft = !!prev.buttons[BUTTON_DPAD_LEFT] || prev.axisLeftRight < -AXIS_THRESHOLD;
-    const wasRight = !!prev.buttons[BUTTON_DPAD_RIGHT] || prev.axisLeftRight > AXIS_THRESHOLD;
-    const wasDown = !!prev.buttons[BUTTON_DPAD_DOWN] || prev.axisDown >= AXIS_THRESHOLD;
+    const wasLeft = prev.left;
+    const wasRight = prev.right;
+    const wasDown = prev.down;
     const now = Date.now();
 
     if (left) {
@@ -141,17 +159,19 @@ export function useGamepad(
     }
 
     if (rotate && !(prev.buttons[BUTTON_A] || prev.buttons[BUTTON_B] || prev.buttons[BUTTON_X])) fire("rotate");
-    if (hardDrop && !(prev.buttons[BUTTON_Y] || prev.buttons[BUTTON_RB] || prev.buttons[BUTTON_DPAD_UP]) &&
-        !(prev.axisUp <= -AXIS_THRESHOLD)) fire("hardDrop");
+    if (
+      hardDrop &&
+      !(
+        prev.buttons[BUTTON_Y] ||
+        prev.buttons[BUTTON_RB] ||
+        prev.up
+      )
+    )
+      fire("hardDrop");
     if (pause && !prev.buttons[BUTTON_START]) fire("pause");
     if (!!buttons[BUTTON_HOME] && !prev.buttons[BUTTON_HOME]) onHomeRef.current?.();
 
-    prevRef.current = {
-      buttons,
-      axisLeftRight: Math.abs(axis0) >= AXIS_THRESHOLD ? axis0 : Math.abs(axis6) >= AXIS_THRESHOLD ? axis6 : 0,
-      axisDown: axis1 >= AXIS_THRESHOLD ? axis1 : axis7 >= AXIS_THRESHOLD ? axis7 : 0,
-      axisUp: axis7 <= -AXIS_THRESHOLD ? axis7 : axis1 <= -AXIS_THRESHOLD ? axis1 : 0,
-    };
+    prevRef.current = { buttons, left, right, down, up };
   }, [enabled]);
 
   useEffect(() => {
