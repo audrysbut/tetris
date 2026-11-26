@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CELL_COLORS, getShape } from "../shared/pieces.ts";
 import type { PieceType } from "../shared/types.ts";
 import { Block } from "./Block.tsx";
@@ -8,26 +9,16 @@ interface HUDProps {
   level: number;
   gameOver: boolean;
   isPaused: boolean;
-  elapsedMs?: number;
 }
 
-export function HUD({
+export const HUD = memo(function HUD({
   score,
   lines,
   level,
   gameOver,
   isPaused,
-  elapsedMs,
 }: HUDProps) {
   const textShadow = "0 1px 2px rgba(0,0,0,0.9), 0 0 4px #000";
-  const timeStr =
-    elapsedMs != null
-      ? `${Math.floor(elapsedMs / 60000)}:${Math.floor(
-          (elapsedMs % 60000) / 1000,
-        )
-          .toString()
-          .padStart(2, "0")}`
-      : null;
   return (
     <div
       style={{
@@ -41,14 +32,13 @@ export function HUD({
       <div>Score: {score}</div>
       <div>Lines: {lines}</div>
       <div>Level: {level}</div>
-      {timeStr != null && <div>Time: {timeStr}</div>}
       {gameOver && (
         <div style={{ color: "#f66", fontWeight: "bold" }}>Game Over</div>
       )}
       {isPaused && !gameOver && <div style={{ color: "#ffc" }}>Paused</div>}
     </div>
   );
-}
+});
 
 interface NextPieceProps {
   nextPieceType: PieceType;
@@ -56,7 +46,7 @@ interface NextPieceProps {
 
 const NEXT_CELL = 16;
 
-export function NextPiece({ nextPieceType }: NextPieceProps) {
+export const NextPiece = memo(function NextPiece({ nextPieceType }: NextPieceProps) {
   const shape = getShape(nextPieceType, 0);
   const rows = shape.length;
   const cols = shape[0].length;
@@ -97,4 +87,4 @@ export function NextPiece({ nextPieceType }: NextPieceProps) {
       </svg>
     </div>
   );
-}
+});

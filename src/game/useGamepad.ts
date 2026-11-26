@@ -45,6 +45,7 @@ export function useGamepad(
     down: false,
     up: false,
   });
+  const scratchButtonsRef = useRef<boolean[]>(Array(20).fill(false));
   const repeatRef = useRef({
     lastLeft: 0,
     lastRight: 0,
@@ -61,11 +62,16 @@ export function useGamepad(
     if (!gp) return;
 
     const prev = prevRef.current;
-    const buttons = Array.from(gp.buttons).map((b) => {
-      if (!b) return false;
-      const btn = b as GamepadButton & { value?: number };
-      return !!btn.pressed || (typeof btn.value === "number" && btn.value > 0);
-    });
+    const buttons = scratchButtonsRef.current;
+    for (let i = 0; i < buttons.length; i++) {
+      const b = gp.buttons[i];
+      if (!b) {
+        buttons[i] = false;
+      } else {
+        const btn = b as GamepadButton & { value?: number };
+        buttons[i] = !!btn.pressed || (typeof btn.value === "number" && btn.value > 0);
+      }
+    }
     const axes = gp.axes ?? [];
     const axis0 = axes[AXIS_LEFT_STICK_X] ?? 0;
     const axis1 = axes[AXIS_LEFT_STICK_Y] ?? 0;
@@ -171,7 +177,9 @@ export function useGamepad(
     if (pause && !prev.buttons[BUTTON_START]) fire("pause");
     if (!!buttons[BUTTON_HOME] && !prev.buttons[BUTTON_HOME]) onHomeRef.current?.();
 
+    const prevButtons = prev.buttons;
     prevRef.current = { buttons, left, right, down, up };
+    scratchButtonsRef.current = prevButtons;
   }, [enabled]);
 
   useEffect(() => {

@@ -9,24 +9,35 @@ import type { KeyAction } from "../game/useKeyboard.ts";
 import { useState, useEffect, useCallback, useRef, type ChangeEvent } from "react";
 import { useFitBoardCellSize } from "../game/useFitBoardCellSize.ts";
 
+function formatElapsed(ms: number): string {
+  return `${Math.floor(ms / 60000)}:${Math.floor((ms % 60000) / 1000)
+    .toString()
+    .padStart(2, "0")}`;
+}
+
+function ElapsedTime({ active }: { active: boolean }) {
+  const [elapsedMs, setElapsedMs] = useState(0);
+
+  useEffect(() => {
+    if (!active) return;
+    const id = setInterval(() => setElapsedMs((e) => e + 100), 100);
+    return () => clearInterval(id);
+  }, [active]);
+
+  return <div>Time: {formatElapsed(elapsedMs)}</div>;
+}
+
 export function SinglePlayerGame() {
   const [constantSpeed, setConstantSpeed] = useState(true);
   const { state, isPaused, setPaused, dispatch, reset } = useSinglePlayer(constantSpeed);
-  const [elapsedMs, setElapsedMs] = useState(0);
+  const [timerKey, setTimerKey] = useState(0);
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const cellSize = useFitBoardCellSize(boardContainerRef);
 
   const handleReset = useCallback(() => {
-    setElapsedMs(0);
+    setTimerKey((k) => k + 1);
     reset();
   }, [reset]);
-
-  // Timer: run only when playing (not paused, not game over)
-  useEffect(() => {
-    if (state.gameOver || isPaused) return;
-    const id = setInterval(() => setElapsedMs((e) => e + 100), 100);
-    return () => clearInterval(id);
-  }, [state.gameOver, isPaused]);
 
   const handleAction = useCallback(
     (action: KeyAction) => {
@@ -100,8 +111,18 @@ export function SinglePlayerGame() {
             level={constantSpeed ? 1 : state.level}
             gameOver={state.gameOver}
             isPaused={isPaused}
-            elapsedMs={elapsedMs}
           />
+          <div
+            style={{
+              marginBottom: 4,
+              fontFamily: "monospace",
+              fontSize: 13,
+              textShadow: "0 1px 2px rgba(0,0,0,0.9), 0 0 4px #000",
+              color: "#fff",
+            }}
+          >
+            <ElapsedTime key={timerKey} active={!state.gameOver && !isPaused} />
+          </div>
           <NextPiece nextPieceType={state.nextPieceType} />
           <div
             style={{

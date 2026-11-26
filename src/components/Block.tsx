@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface BlockProps {
   x: number;
   y: number;
@@ -8,18 +10,24 @@ interface BlockProps {
   ry?: number;
 }
 
-export function Block({ x, y, width, height, fill, rx, ry }: BlockProps) {
+export const Block = memo(function Block({
+  x,
+  y,
+  width,
+  height,
+  fill,
+  rx,
+  ry,
+}: BlockProps) {
   return (
-    <g>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill={fill}
-        rx={rx ?? 4}
-        ry={ry ?? 4}
-      />
-    </g>
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill={fill}
+      rx={rx ?? 4}
+      ry={ry ?? 4}
+    />
   );
-}
+});

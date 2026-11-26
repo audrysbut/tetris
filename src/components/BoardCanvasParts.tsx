@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { memo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Block } from "./Block.tsx";
 import type { Board, CurrentPiece } from "../shared/types.ts";
@@ -17,7 +17,7 @@ interface BoardCellsProps {
 
 const CLEAR_ANIMATION_DURATION = 0.2;
 
-export function BoardCells({
+export const BoardCells = memo(function BoardCells({
   board,
   cellSize,
   clearingRows = [],
@@ -71,14 +71,14 @@ export function BoardCells({
       )}
     </>
   );
-}
+});
 
 interface GhostPieceProps {
   ghost: CurrentPiece;
   cellSize: number;
 }
 
-export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
+export const GhostPiece = memo(function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
   const size = cellSize - BORDER * 2;
   const groupX = ghost.position.x * cellSize;
   const groupY = ghost.position.y * cellSize;
@@ -112,7 +112,7 @@ export function GhostPiece({ ghost, cellSize }: GhostPieceProps) {
       )}
     </motion.g>
   );
-}
+});
 
 interface CurrentPieceViewProps {
   piece: CurrentPiece;
@@ -121,7 +121,7 @@ interface CurrentPieceViewProps {
   boardHeight: number;
 }
 
-export function CurrentPieceView({
+export const CurrentPieceView = memo(function CurrentPieceView({
   piece,
   effectiveY,
   cellSize,
@@ -186,4 +186,4 @@ export function CurrentPieceView({
       </motion.g>
     </motion.g>
   );
-}
+});

@@ -169,10 +169,10 @@ const SHAPES: Record<PieceType, number[][][]> = {
   ],
 };
 
-/** Get shape matrix for a piece type and rotation (0-3) */
-export function getShape(type: PieceType, rotation: number): number[][] {
+/** Get shape matrix for a piece type and rotation (0-3). Readonly; do not mutate. */
+export function getShape(type: PieceType, rotation: number): readonly number[][] {
   const r = ((rotation % 4) + 4) % 4;
-  return SHAPES[type][r].map((row) => [...row]);
+  return SHAPES[type][r];
 }
 
 /** Seeded PRNG (mulberry32). Returns a function that yields values in [0, 1). */

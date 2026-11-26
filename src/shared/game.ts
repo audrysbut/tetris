@@ -302,11 +302,10 @@ export function lockPiece(state: GameState): GameState {
   const board = mergePiece(state.board, state.currentPiece);
   const fullRows = getFullRows(board);
   if (fullRows.length === 0) {
-    const [newBoard] = clearLines(board);
-    const spawned = computeSpawn(state, newBoard);
+    const spawned = computeSpawn(state, board);
     return {
       ...state,
-      board: newBoard,
+      board,
       currentPiece: spawned.currentPiece,
       nextPieceType: spawned.nextPieceType,
       pieceIndex: spawned.pieceIndex,

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, type RefObject } from "react";
+import { useEffect, useCallback, useMemo, useRef, type RefObject } from "react";
 import { useFitBoardCellSize } from "../game/useFitBoardCellSize.ts";
 import { useMultiPlayer } from "../game/useMultiPlayer.ts";
 import { useKeyboard } from "../game/useKeyboard.ts";
@@ -109,9 +109,10 @@ export function MultiplayerGame({ peerConnection, onBack }: MultiplayerGameProps
   }, [gameActive]);
 
   const myGameState = multi.myState;
-  const oppGameState: GameState = multi.oppState
-    ? toGameState(multi.oppState)
-    : createEmptyGameState();
+  const oppGameState: GameState = useMemo(
+    () => (multi.oppState ? toGameState(multi.oppState) : createEmptyGameState()),
+    [multi.oppState],
+  );
 
   const showWaiting = multi.gameStatus === "waiting";
 

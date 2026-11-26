@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ghostPosition } from "../shared/game.ts";
 import { BOARD_HEIGHT, BOARD_WIDTH, type GameState } from "../shared/types.ts";
 import {
@@ -27,7 +28,7 @@ function makeGradient(id: string, color: string) {
   );
 }
 
-export function BoardCanvas({
+export const BoardCanvas = memo(function BoardCanvas({
   state,
   width = BOARD_WIDTH,
   height = BOARD_HEIGHT,
@@ -92,4 +93,4 @@ export function BoardCanvas({
       )}
     </svg>
   );
-}
+});
